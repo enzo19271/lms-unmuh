@@ -242,17 +242,6 @@
       "kehadiran": []
     },
     {
-      "id": "abs_1781095651426",
-      "matkul": "Manajemen Proyek TI",
-      "judul": "Pertemuan 2",
-      "tanggal": "2026-06-10T12:47",
-      "keterangan": "",
-      "dosen_id": "usr_1781089978920",
-      "status": "aktif",
-      "created_at": "2026-06-10T12:47:31.426Z",
-      "kehadiran": []
-    },
-    {
       "id": "abs_1781095674854",
       "matkul": "Manajemen Proyek TI",
       "judul": "Pertemuan 3",
