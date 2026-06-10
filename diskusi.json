@@ -129,6 +129,17 @@
         "isi": "hayo",
         "created_at": "2026-06-10T11:44:42.719Z",
         "dihapus": false
+      },
+      {
+        "id": "msg_1781095731570_xjsah",
+        "sender_id": "usr_1781089978920",
+        "sender_nim": "20230102",
+        "sender_nama": "Dimz Saputra, M. Pd.",
+        "role": "dosen",
+        "matkul": "Manajemen Proyek TI",
+        "isi": "halo semuanya",
+        "created_at": "2026-06-10T12:48:51.570Z",
+        "dihapus": false
       }
     ],
     "ui_ux": [
