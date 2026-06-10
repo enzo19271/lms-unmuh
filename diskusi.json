@@ -117,6 +117,19 @@
         "created_at": "2026-06-10T06:39:10.688Z",
         "dihapus": false
       }
+    ],
+    "manajemen_proyek_ti": [
+      {
+        "id": "msg_1781091882719_xbh4f",
+        "sender_id": "usr_1781089978920",
+        "sender_nim": "20230102",
+        "sender_nama": "Dimz Saputra, M. Pd.",
+        "role": "dosen",
+        "matkul": "Manajemen Proyek TI",
+        "isi": "hayo",
+        "created_at": "2026-06-10T11:44:42.719Z",
+        "dihapus": false
+      }
     ]
   }
 }
