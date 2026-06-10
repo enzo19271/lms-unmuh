@@ -185,6 +185,17 @@
       "status": "aktif",
       "created_at": "2026-06-10T11:47:15.657Z",
       "kehadiran": []
+    },
+    {
+      "id": "abs_1781092052888",
+      "matkul": "UI UX",
+      "judul": "Pertemuan 3",
+      "tanggal": "2026-06-14T11:47",
+      "keterangan": "",
+      "dosen_id": "usr_1781089978920",
+      "status": "aktif",
+      "created_at": "2026-06-10T11:47:32.888Z",
+      "kehadiran": []
     }
   ]
 }
