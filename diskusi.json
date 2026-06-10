@@ -130,6 +130,19 @@
         "created_at": "2026-06-10T11:44:42.719Z",
         "dihapus": false
       }
+    ],
+    "ui_ux": [
+      {
+        "id": "msg_1781091890983_ukcyf",
+        "sender_id": "usr_1781089978920",
+        "sender_nim": "20230102",
+        "sender_nama": "Dimz Saputra, M. Pd.",
+        "role": "dosen",
+        "matkul": "UI UX",
+        "isi": "hlao",
+        "created_at": "2026-06-10T11:44:50.983Z",
+        "dihapus": false
+      }
     ]
   }
 }
