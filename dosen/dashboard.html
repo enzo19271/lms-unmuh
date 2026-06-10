@@ -559,6 +559,8 @@
   let pertemuanData = [];
   let verifPertemuanId = null;
   let allMhsJurusan = [];
+  let activeDiscMatkul = null;
+  let diskusiPolling   = null;
 
   const pages  = ['beranda','matkul','tugas','absensi','diskusi','profil'];
   const titles = {beranda:'Beranda',matkul:'Mata Kuliah',tugas:'Manajemen Tugas',absensi:'Absensi',diskusi:'Diskusi',profil:'Profil Saya'};
@@ -1163,9 +1165,6 @@
   }
 
   // ─── DISKUSI ──────────────────────────────────────────────────────────────
-
-  let activeDiscMatkul = null;
-  let diskusiPolling   = null;
 
   function renderDiskusiRooms() {
     const list = document.getElementById('diskusi-room-list');
