@@ -565,38 +565,50 @@
   // ─── INIT ──────────────────────────────────────────────────────────────────
 
   (async () => {
-    currentUser = await Auth.requireLogin(['dosen']);
-    if (!currentUser) return;
+    // 1. Gunakan cached user dari localStorage untuk langsung render UI
+    //    tanpa harus menunggu verify ke server (yang bisa lambat karena GitHub)
+    const cached = Auth.getUser();
+    if (!cached) { window.location.href = '/login.html'; return; }
+    if (cached.role !== 'dosen') { window.location.href = '/login.html'; return; }
 
+    currentUser = cached;
+    initUI();
+
+    // 2. Load semua data dari API
+    await loadTugas();
+    await loadMahasiswaJurusan();
+    showPage('beranda');
+
+    // 3. Verify ke server di background — tidak memblokir render
+    Auth.verify().then(user => {
+      if (!user) { Auth.logout(); return; }
+      // Update data user jika ada perubahan dari server
+      currentUser = user;
+      myMatkul = user.mata_kuliah || [];
+      initUI();
+    }).catch(() => { /* abaikan error network saat background verify */ });
+  })();
+
+  function initUI() {
     myMatkul = currentUser.mata_kuliah || [];
     const inisial = currentUser.nama.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
     ['sb-avatar','top-avatar','profil-avatar'].forEach(id => {
       const el = document.getElementById(id); if(el) el.textContent = inisial;
     });
-    document.getElementById('sb-nama').textContent      = currentUser.nama;
-    document.getElementById('sb-nip').textContent       = currentUser.nim_nip;
-    document.getElementById('profil-nama').textContent  = currentUser.nama;
-    document.getElementById('profil-nip').textContent   = currentUser.nim_nip;
+    document.getElementById('sb-nama').textContent        = currentUser.nama;
+    document.getElementById('sb-nip').textContent         = currentUser.nim_nip;
+    document.getElementById('profil-nama').textContent    = currentUser.nama;
+    document.getElementById('profil-nip').textContent     = currentUser.nim_nip;
     document.getElementById('profil-jurusan').textContent = currentUser.jurusan || '—';
-    document.getElementById('profil-mk').textContent    = myMatkul.length ? myMatkul.join(', ') : '—';
+    document.getElementById('profil-mk').textContent      = myMatkul.length ? myMatkul.join(', ') : '—';
     const firstName = currentUser.nama.split(' ')[0];
-    document.getElementById('greeting').textContent     = `Selamat Datang, ${firstName}`;
-    document.getElementById('banner-nama').textContent  = `Halo, ${firstName}! 👋`;
-
-    // Isi dropdown matkul di modal tugas
+    document.getElementById('greeting').textContent  = `Selamat Datang, ${firstName}`;
+    document.getElementById('banner-nama').textContent = `Halo, ${firstName}! 👋`;
     populateMatkulDropdown();
-    // Isi filter tugas
     updateTugasMatkulFilter();
-    // Setup absensi tabs
     renderAbsensiTabs();
-    // Setup diskusi rooms
     renderDiskusiRooms();
-
-    // Load data dari API — tugas harus selesai dulu sebelum render matkul grid
-    await loadTugas();
-    await loadMahasiswaJurusan();
-    showPage('beranda');
-  })();
+  }
 
   // ─── HELPERS ──────────────────────────────────────────────────────────────
 
