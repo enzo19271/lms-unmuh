@@ -630,6 +630,19 @@
       "created_at": "2026-06-10T05:39:51.402Z",
       "jurusan": "Pendidikan Ilmu Ekonomi",
       "semester": 2
+    },
+    {
+      "id": "usr_1781089978920",
+      "nim_nip": "20230102",
+      "nama": "Dimz Saputra, M. Pd.",
+      "password": "2a1eb6ba8e713a2573dce6ad3c63da87898ec11c044149220b8eb9ccfe73f2da",
+      "role": "dosen",
+      "created_at": "2026-06-10T11:12:58.920Z",
+      "jurusan": "Sistem Informasi",
+      "mata_kuliah": [
+        "UI UX",
+        "Manajemen Proyek TI"
+      ]
     }
   ]
 }
