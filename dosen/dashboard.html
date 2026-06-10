@@ -20,6 +20,8 @@
     }
     html,body{height:100%;font-family:'Inter',sans-serif;background:var(--gray-50);color:var(--gray-700)}
 
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
     /* SIDEBAR */
     .sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:var(--navy);display:flex;flex-direction:column;z-index:100;transition:transform .3s cubic-bezier(.4,0,.2,1)}
     .sidebar-logo{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:12px}
@@ -573,20 +575,18 @@
 
     currentUser = cached;
     initUI();
+    showPage('beranda'); // tampilkan halaman dulu, data menyusul
 
-    // 2. Load semua data dari API
-    await loadTugas();
-    await loadMahasiswaJurusan();
-    showPage('beranda');
+    // 2. Load data paralel di background
+    Promise.all([loadTugas(), loadMahasiswaJurusan()]);
 
     // 3. Verify ke server di background — tidak memblokir render
     Auth.verify().then(user => {
       if (!user) { Auth.logout(); return; }
-      // Update data user jika ada perubahan dari server
       currentUser = user;
       myMatkul = user.mata_kuliah || [];
       initUI();
-    }).catch(() => { /* abaikan error network saat background verify */ });
+    }).catch(() => {});
   })();
 
   function initUI() {
@@ -608,6 +608,7 @@
     updateTugasMatkulFilter();
     renderAbsensiTabs();
     renderDiskusiRooms();
+    updateStats(); // render stat cards dengan data awal (tugas mungkin belum ada, tapi matkul sudah)
   }
 
   // ─── HELPERS ──────────────────────────────────────────────────────────────
@@ -635,18 +636,29 @@
   // ─── TUGAS ────────────────────────────────────────────────────────────────
 
   async function loadTugas() {
+    // Tampilkan skeleton loading
+    const skeletonRow = '<div style="height:14px;background:var(--gray-200);border-radius:6px;margin:6px 0;animation:pulse 1.5s infinite"></div>';
+    document.getElementById('beranda-tugas-list').innerHTML = skeletonRow.repeat(3);
+    document.getElementById('tugas-list').innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray-500);font-size:13px">⏳ Memuat data tugas...</div>';
     try {
       const res  = await fetch(`/api/tugas/list?dosen_id=${currentUser.id}`, {
         headers: authHeaders(),
       });
       const data = await res.json();
-      if (!res.ok) { showToast('Gagal memuat tugas: ' + (data.error||'')); return; }
+      if (!res.ok) {
+        showToast('Gagal memuat tugas: ' + (data.error||''));
+        document.getElementById('beranda-tugas-list').innerHTML = '<div style="text-align:center;padding:20px;color:var(--red);font-size:13px">Gagal memuat tugas.</div>';
+        return;
+      }
       allTugas = data.tugas || [];
       renderTugas(allTugas);
       renderBerandaTugas(allTugas);
       updateStats();
       updateNavBadge();
-    } catch { showToast('Tidak dapat terhubung ke server.'); }
+    } catch(e) {
+      showToast('Tidak dapat terhubung ke server.');
+      document.getElementById('beranda-tugas-list').innerHTML = '<div style="text-align:center;padding:20px;color:var(--red);font-size:13px">Gagal terhubung ke server.</div>';
+    }
   }
 
   function updateStats() {
@@ -852,15 +864,20 @@
   // ─── MAHASISWA (untuk absensi) ────────────────────────────────────────────
 
   async function loadMahasiswaJurusan() {
+    // Tampilkan skeleton loading di matkul grid
+    document.getElementById('beranda-matkul-list').innerHTML = '<div style="height:14px;background:var(--gray-200);border-radius:6px;margin:6px 0;animation:pulse 1.5s infinite"></div>'.repeat(3);
+    document.getElementById('matkul-grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--gray-500);font-size:13px">⏳ Memuat data mata kuliah...</div>';
     try {
       const res  = await fetch('/api/auth/list-mahasiswa', {
         method: 'POST',
         headers: authHeaders(),
         body: JSON.stringify({})
       });
-      if (!res.ok) { allMhsList = []; renderBerandaMatkul(); renderMatkulGrid(); return; }
-      const data = await res.json();
-      allMhsList = (data.mahasiswa || []).filter(m => m.jurusan === currentUser.jurusan);
+      if (!res.ok) { allMhsList = []; }
+      else {
+        const data = await res.json();
+        allMhsList = (data.mahasiswa || []).filter(m => m.jurusan === currentUser.jurusan);
+      }
     } catch { allMhsList = []; }
     renderBerandaMatkul();
     renderMatkulGrid();
