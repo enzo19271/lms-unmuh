@@ -1079,27 +1079,40 @@
     const alasanLabel = { hadir:'✅ Hadir', izin:'📋 Izin', sakit:'🤒 Sakit' };
     const rows = mhsJurusan.map((m, i) => {
       const k = ptm.kehadiran.find(x => x.mhs_id === m.id || x.nim === m.nim_nip);
+      // curStatus: status dari mahasiswa (submit absen) atau sudah diverifikasi dosen
       const curStatus = k?.status || '';
-      const options = ['hadir','izin','sakit','tidak_hadir'].map(s =>
-        `<option value="${s}" ${curStatus===s?'selected':''}>${s==='hadir'?'✅ Hadir':s==='izin'?'📋 Izin':s==='sakit'?'🤒 Sakit':'❌ Tidak Hadir'}</option>`
+      // Label status untuk ditampilkan di dropdown
+      const statusLabel = { hadir:'✅ Hadir', izin:'📋 Izin', sakit:'🤒 Sakit', tidak_hadir:'❌ Tidak Hadir', menunggu:'⏳ Menunggu' };
+      // Semua pilihan yang bisa dipilih dosen
+      const statusOptions = ['hadir','izin','sakit','tidak_hadir'];
+      const options = statusOptions.map(s =>
+        `<option value="${s}" ${curStatus===s?'selected':''}>${statusLabel[s]}</option>`
       ).join('');
+      // Warna border select sesuai status mahasiswa
+      const borderColor = curStatus === 'menunggu' ? 'var(--gold)' :
+                          curStatus === 'hadir'    ? 'var(--green)' :
+                          curStatus === 'izin'     ? 'var(--yellow)' :
+                          curStatus === 'sakit'    ? 'var(--yellow)' :
+                          curStatus === 'tidak_hadir' ? 'var(--red)' : 'var(--gray-200)';
+      // Kalau mahasiswa sudah submit (menunggu/hadir/izin/sakit), tampilkan info pengajuan
       const alasanTag = k?.alasan_tipe
         ? `<span style="font-size:10px;background:var(--blue-pale);color:var(--blue);padding:2px 6px;border-radius:8px;font-weight:700;white-space:nowrap"> ${alasanLabel[k.alasan_tipe]||k.alasan_tipe}</span>`
         : '';
       const menungguBadge = curStatus === 'menunggu'
-        ? ` <span style="font-size:10px;color:var(--gold);font-weight:700">⏳ menunggu${k?.alasan_tipe ? '' : ''}</span>`
+        ? `<span style="font-size:10px;background:var(--yellow-pale);color:var(--yellow);padding:2px 7px;border-radius:8px;font-weight:700;margin-left:4px">⏳ Menunggu verifikasi</span>`
         : '';
       return `<tr>
         <td style="padding:8px 12px;font-size:12px">${i+1}</td>
         <td style="padding:8px 12px;font-family:monospace;font-size:11px">${m.nim_nip}</td>
         <td style="padding:8px 12px;font-size:12px">${m.nama}${alasanTag}${menungguBadge}</td>
         <td style="padding:8px 12px">
-          <select onchange="updateVerifStatus('${ptm.id}','${m.id}','${m.nim_nip}','${m.nama.replace(/'/g,'')}',this.value)" style="padding:5px 8px;border:1.5px solid var(--gray-200);border-radius:6px;font-size:12px;font-family:Inter,sans-serif;cursor:pointer">
-            <option value="">-- pilih --</option>
+          <select onchange="updateVerifStatus('${ptm.id}','${m.id}','${m.nim_nip}','${m.nama.replace(/'/g,'')}',this.value)"
+            style="padding:5px 8px;border:1.5px solid ${borderColor};border-radius:6px;font-size:12px;font-family:Inter,sans-serif;cursor:pointer;background:white">
+            ${curStatus ? '' : '<option value="">-- pilih --</option>'}
             ${options}
           </select>
         </td>
-        <td style="padding:8px 12px;font-size:11px;color:var(--gray-500)">${k?.keterangan||''}</td>
+        <td style="padding:8px 12px;font-size:11px;color:var(--gray-500)">${k?.keterangan||'—'}</td>
       </tr>`;
     }).join('');
     document.getElementById('verif-list').innerHTML =
