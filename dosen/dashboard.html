@@ -133,6 +133,8 @@
     /* UPLOAD TUGAS MODAL */
     .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;padding:20px}
     .modal-bg.open{display:flex}
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;padding:20px}
+    .modal-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:800;color:var(--navy)}
     .modal{background:white;border-radius:16px;width:100%;max-width:520px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.2)}
     .modal-header{padding:20px 24px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between}
     .modal-header h3{font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:800;color:var(--navy)}
@@ -290,6 +292,57 @@
   </div>
 </div>
 
+<!-- MODAL BUAT PERTEMUAN -->
+<div class="modal-overlay" id="modal-pertemuan" style="display:none">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-header">
+      <span class="modal-title">Buat Pertemuan Baru</span>
+      <button class="modal-close" onclick="closeModalPertemuan()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Mata Kuliah</label>
+        <select class="form-input" id="ptm-matkul"><option value="">-- Pilih Mata Kuliah --</option></select>
+      </div>
+      <div class="form-group">
+        <label>Judul / Topik Pertemuan</label>
+        <input type="text" class="form-input" id="ptm-judul" placeholder="cth. Pertemuan 1 — Pengenalan Atletik"/>
+      </div>
+      <div class="form-group">
+        <label>Tanggal &amp; Waktu</label>
+        <input type="datetime-local" class="form-input" id="ptm-tanggal"/>
+      </div>
+      <div class="form-group">
+        <label>Keterangan (opsional)</label>
+        <textarea class="form-input" id="ptm-keterangan" rows="2" placeholder="Informasi tambahan untuk mahasiswa..."></textarea>
+      </div>
+      <div id="ptm-alert" style="display:none;padding:10px 14px;border-radius:8px;font-size:13px;background:var(--red-pale);color:var(--red);margin-top:8px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-md" onclick="closeModalPertemuan()" style="background:var(--gray-100);color:var(--gray-600)">Batal</button>
+      <button class="btn-md" onclick="submitBuatPertemuan()" id="ptm-submit-btn" style="background:var(--blue);color:white">Buat Pertemuan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL VERIFIKASI KEHADIRAN -->
+<div class="modal-overlay" id="modal-verifikasi" style="display:none">
+  <div class="modal" style="max-width:680px">
+    <div class="modal-header">
+      <span class="modal-title" id="verif-modal-title">Verifikasi Kehadiran</span>
+      <button class="modal-close" onclick="closeModalVerifikasi()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div id="verif-list"></div>
+      <div id="verif-alert" style="display:none;padding:10px;border-radius:8px;font-size:13px;background:var(--red-pale);color:var(--red);margin-top:8px"></div>
+    </div>
+    <div class="modal-footer" style="justify-content:space-between">
+      <button onclick="tutupPertemuan()" id="btn-tutup-ptm" style="padding:9px 16px;background:var(--gray-200);color:var(--gray-700);border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">🔒 Tutup Pertemuan</button>
+      <button class="btn-md" onclick="closeModalVerifikasi()" style="background:var(--blue);color:white">Selesai</button>
+    </div>
+  </div>
+</div>
+
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo">
@@ -431,57 +484,6 @@
     </div>
   </div>
 
-  <!-- MODAL BUAT PERTEMUAN -->
-  <div class="modal-overlay" id="modal-pertemuan" style="display:none">
-    <div class="modal" style="max-width:440px">
-      <div class="modal-header">
-        <span class="modal-title">Buat Pertemuan Baru</span>
-        <button class="modal-close" onclick="closeModalPertemuan()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Mata Kuliah</label>
-          <select class="form-input" id="ptm-matkul"><option value="">-- Pilih Mata Kuliah --</option></select>
-        </div>
-        <div class="form-group">
-          <label>Judul / Topik Pertemuan</label>
-          <input type="text" class="form-input" id="ptm-judul" placeholder="cth. Pertemuan 1 — Pengenalan Atletik"/>
-        </div>
-        <div class="form-group">
-          <label>Tanggal &amp; Waktu</label>
-          <input type="datetime-local" class="form-input" id="ptm-tanggal"/>
-        </div>
-        <div class="form-group">
-          <label>Keterangan (opsional)</label>
-          <textarea class="form-input" id="ptm-keterangan" rows="2" placeholder="Informasi tambahan untuk mahasiswa..."></textarea>
-        </div>
-        <div id="ptm-alert" style="display:none;padding:10px 14px;border-radius:8px;font-size:13px;background:var(--red-pale);color:var(--red);margin-top:8px"></div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-md" onclick="closeModalPertemuan()" style="background:var(--gray-100);color:var(--gray-600)">Batal</button>
-        <button class="btn-md" onclick="submitBuatPertemuan()" id="ptm-submit-btn" style="background:var(--blue);color:white">Buat Pertemuan</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL VERIFIKASI KEHADIRAN -->
-  <div class="modal-overlay" id="modal-verifikasi" style="display:none">
-    <div class="modal" style="max-width:680px">
-      <div class="modal-header">
-        <span class="modal-title" id="verif-modal-title">Verifikasi Kehadiran</span>
-        <button class="modal-close" onclick="closeModalVerifikasi()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
-      </div>
-      <div class="modal-body">
-        <div id="verif-list"></div>
-        <div id="verif-alert" style="display:none;padding:10px;border-radius:8px;font-size:13px;background:var(--red-pale);color:var(--red);margin-top:8px"></div>
-      </div>
-      <div class="modal-footer" style="justify-content:space-between">
-        <button onclick="tutupPertemuan()" id="btn-tutup-ptm" style="padding:9px 16px;background:var(--gray-200);color:var(--gray-700);border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">🔒 Tutup Pertemuan</button>
-        <button class="btn-md" onclick="closeModalVerifikasi()" style="background:var(--blue);color:white">Selesai</button>
-      </div>
-    </div>
-  </div>
-
   <!-- DISKUSI -->
   <div class="content" id="page-diskusi">
     <div class="page-header"><h2>Diskusi</h2><p>Ruang diskusi real-time dengan mahasiswa per mata kuliah</p></div>
@@ -552,6 +554,9 @@
   let allTugas    = []; // dari API
   let allMhsList  = []; // semua mahasiswa di jurusan yang sama
   let activeAbsensiMatkul = null;
+  let pertemuanData = [];
+  let verifPertemuanId = null;
+  let allMhsJurusan = [];
 
   const pages  = ['beranda','matkul','tugas','absensi','diskusi','profil'];
   const titles = {beranda:'Beranda',matkul:'Mata Kuliah',tugas:'Manajemen Tugas',absensi:'Absensi',diskusi:'Diskusi',profil:'Profil Saya'};
@@ -587,8 +592,9 @@
     // Setup diskusi rooms
     renderDiskusiRooms();
 
-    // Load data dari API
-    await Promise.all([loadTugas(), loadMahasiswaJurusan()]);
+    // Load data dari API — tugas harus selesai dulu sebelum render matkul grid
+    await loadTugas();
+    await loadMahasiswaJurusan();
     showPage('beranda');
   })();
 
@@ -673,7 +679,7 @@
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             ${statusPill(t.status)}
             <button onclick='editTugas(${JSON.stringify(t).replace(/'/g,"&#39;")})' style="padding:5px 12px;background:var(--blue-pale);color:var(--blue);border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">Edit</button>
-            <button onclick="deleteTugas('${t.id}','${t.judul.replace(/'/g,"\\'")}')'" style="padding:5px 12px;background:var(--red-pale);color:var(--red);border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">Hapus</button>
+            <button onclick="deleteTugas('${t.id}','${t.judul.replace(/'/g,'\\'')}')" style="padding:5px 12px;background:var(--red-pale);color:var(--red);border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">Hapus</button>
           </div>
         </div>
       </div>`).join('');
@@ -843,17 +849,12 @@
       if (!res.ok) { allMhsList = []; renderBerandaMatkul(); renderMatkulGrid(); return; }
       const data = await res.json();
       allMhsList = (data.mahasiswa || []).filter(m => m.jurusan === currentUser.jurusan);
-      renderBerandaMatkul();
-      renderMatkulGrid();
-    } catch { allMhsList = []; renderBerandaMatkul(); renderMatkulGrid(); }
+    } catch { allMhsList = []; }
+    renderBerandaMatkul();
+    renderMatkulGrid();
   }
 
   // ─── ABSENSI ──────────────────────────────────────────────────────────────
-
-  let activeAbsensiMatkul = null;
-  let pertemuanData = [];   // cache pertemuan yang sedang ditampilkan
-  let verifPertemuanId = null;  // pertemuan yang sedang diverifikasi
-  let allMhsJurusan = [];   // cache mahasiswa jurusan dari allMhsList
 
   function renderAbsensiTabs() {
     const tabs = document.getElementById('absensi-tabs');
@@ -945,16 +946,20 @@
   function renderKehadiranTable(ptm) {
     const mhsJurusan = allMhsJurusan;
     if (!mhsJurusan.length) return '<div style="font-size:13px;color:var(--gray-500)">Belum ada mahasiswa di jurusan ini.</div>';
+    const alasanLabel = { hadir:'✅ Hadir', izin:'📋 Izin', sakit:'🤒 Sakit' };
     const rows = mhsJurusan.map((m, i) => {
       const k = ptm.kehadiran.find(x => x.mhs_id === m.id || x.nim === m.nim_nip);
       const statusHtml = k
-        ? `<span class="status-pill ${k.status}">${k.status === 'menunggu' ? '⏳ Menunggu' : k.status === 'hadir' ? '✅ Hadir' : k.status === 'izin' ? '📋 Izin' : '❌ Tidak Hadir'}</span>`
+        ? `<span class="status-pill ${k.status}">${k.status === 'menunggu' ? '⏳ Menunggu' : k.status === 'hadir' ? '✅ Hadir' : k.status === 'izin' ? '📋 Izin' : k.status === 'sakit' ? '🤒 Sakit' : '❌ Tidak Hadir'}</span>`
         : '<span style="font-size:12px;color:var(--gray-400)">—</span>';
+      const alasanTag = k?.alasan_tipe
+        ? `<span style="font-size:10px;background:var(--blue-pale);color:var(--blue);padding:2px 7px;border-radius:10px;font-weight:600;margin-left:4px">${alasanLabel[k.alasan_tipe]||k.alasan_tipe}</span>`
+        : '';
       return `<tr>
         <td style="padding:8px 12px;font-size:12px">${i+1}</td>
         <td style="padding:8px 12px;font-family:monospace;font-size:11px">${m.nim_nip}</td>
         <td style="padding:8px 12px;font-size:12px">${m.nama}</td>
-        <td style="padding:8px 12px">${statusHtml}</td>
+        <td style="padding:8px 12px">${statusHtml}${alasanTag}</td>
         <td style="padding:8px 12px;font-size:12px;color:var(--gray-500)">${k?.keterangan||'—'}</td>
       </tr>`;
     }).join('');
@@ -969,7 +974,10 @@
   // ── Modal Buat Pertemuan ──
 
   function openModalPertemuan() {
-    document.getElementById('modal-pertemuan').style.display = 'flex';
+    const el = document.getElementById('modal-pertemuan');
+    el.style.display = 'flex';
+    el.style.alignItems = 'center';
+    el.style.justifyContent = 'center';
     document.getElementById('ptm-alert').style.display = 'none';
     document.getElementById('ptm-judul').value = '';
     document.getElementById('ptm-tanggal').value = new Date().toISOString().slice(0,16);
@@ -1020,7 +1028,10 @@
     document.getElementById('btn-tutup-ptm').style.display = ptm.status === 'aktif' ? 'inline-block' : 'none';
     document.getElementById('verif-alert').style.display = 'none';
     renderVerifList(ptm);
-    document.getElementById('modal-verifikasi').style.display = 'flex';
+    const verifEl = document.getElementById('modal-verifikasi');
+    verifEl.style.display = 'flex';
+    verifEl.style.alignItems = 'center';
+    verifEl.style.justifyContent = 'center';
   }
 
   function closeModalVerifikasi() {
@@ -1034,17 +1045,23 @@
       document.getElementById('verif-list').innerHTML = '<div style="font-size:13px;color:var(--gray-500);text-align:center;padding:24px">Belum ada mahasiswa di jurusan ini.</div>';
       return;
     }
+    const alasanLabel = { hadir:'✅ Hadir', izin:'📋 Izin', sakit:'🤒 Sakit' };
     const rows = mhsJurusan.map((m, i) => {
       const k = ptm.kehadiran.find(x => x.mhs_id === m.id || x.nim === m.nim_nip);
       const curStatus = k?.status || '';
-      const options = ['hadir','izin','tidak_hadir'].map(s =>
-        `<option value="${s}" ${curStatus===s?'selected':''}>${s==='hadir'?'✅ Hadir':s==='izin'?'📋 Izin':'❌ Tidak Hadir'}</option>`
+      const options = ['hadir','izin','sakit','tidak_hadir'].map(s =>
+        `<option value="${s}" ${curStatus===s?'selected':''}>${s==='hadir'?'✅ Hadir':s==='izin'?'📋 Izin':s==='sakit'?'🤒 Sakit':'❌ Tidak Hadir'}</option>`
       ).join('');
-      const menungguBadge = curStatus === 'menunggu' ? ' <span style="font-size:10px;color:var(--gold);font-weight:700">⏳ mengajukan</span>' : '';
+      const alasanTag = k?.alasan_tipe
+        ? `<span style="font-size:10px;background:var(--blue-pale);color:var(--blue);padding:2px 6px;border-radius:8px;font-weight:700;white-space:nowrap"> ${alasanLabel[k.alasan_tipe]||k.alasan_tipe}</span>`
+        : '';
+      const menungguBadge = curStatus === 'menunggu'
+        ? ` <span style="font-size:10px;color:var(--gold);font-weight:700">⏳ menunggu${k?.alasan_tipe ? '' : ''}</span>`
+        : '';
       return `<tr>
         <td style="padding:8px 12px;font-size:12px">${i+1}</td>
         <td style="padding:8px 12px;font-family:monospace;font-size:11px">${m.nim_nip}</td>
-        <td style="padding:8px 12px;font-size:12px">${m.nama}${menungguBadge}</td>
+        <td style="padding:8px 12px;font-size:12px">${m.nama}${alasanTag}${menungguBadge}</td>
         <td style="padding:8px 12px">
           <select onchange="updateVerifStatus('${ptm.id}','${m.id}','${m.nim_nip}','${m.nama.replace(/'/g,'')}',this.value)" style="padding:5px 8px;border:1.5px solid var(--gray-200);border-radius:6px;font-size:12px;font-family:Inter,sans-serif;cursor:pointer">
             <option value="">-- pilih --</option>
@@ -1055,7 +1072,7 @@
       </tr>`;
     }).join('');
     document.getElementById('verif-list').innerHTML =
-      `<table class="abs-table" style="font-size:13px;width:100%"><thead><tr><th>#</th><th>NIM</th><th>Nama</th><th>Status</th><th>Ket. Mahasiswa</th></tr></thead><tbody>${rows}</tbody></table>`;
+      `<table class="abs-table" style="font-size:13px;width:100%"><thead><tr><th>#</th><th>NIM</th><th>Nama</th><th>Verifikasi</th><th>Ket. Mahasiswa</th></tr></thead><tbody>${rows}</tbody></table>`;
   }
 
   async function updateVerifStatus(pertemuanId, mhsId, nim, nama, status) {
