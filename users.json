@@ -366,7 +366,9 @@
       "role": "mahasiswa",
       "created_at": "2026-06-10T05:23:04.562667Z",
       "jurusan": "Sistem Informasi",
-      "semester": 5
+      "semester": 2,
+      "mata_kuliah": [],
+      "updated_at": "2026-06-10T11:13:45.836Z"
     },
     {
       "id": "usr_1781430625477",
