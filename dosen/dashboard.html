@@ -691,7 +691,7 @@
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             ${statusPill(t.status)}
             <button onclick='editTugas(${JSON.stringify(t).replace(/'/g,"&#39;")})' style="padding:5px 12px;background:var(--blue-pale);color:var(--blue);border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">Edit</button>
-            <button onclick="deleteTugas('${t.id}','${t.judul.replace(/'/g,'\\'')}')" style="padding:5px 12px;background:var(--red-pale);color:var(--red);border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">Hapus</button>
+            <button onclick="deleteTugas(this.dataset.id,this.dataset.judul)" data-id="${t.id}" data-judul="${t.judul.replace(/"/g,'&quot;')}" style="padding:5px 12px;background:var(--red-pale);color:var(--red);border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">Hapus</button>
           </div>
         </div>
       </div>`).join('');
