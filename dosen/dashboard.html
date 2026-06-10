@@ -4,377 +4,376 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard Dosen — LMS</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet"/>
   <style>
-    :root {
-      --navy:#0F2A5E; --blue:#1B4FBF; --blue-light:#2563EB; --blue-pale:#EFF4FF;
-      --gold:#C9A84C; --sidebar-w:256px; --topbar-h:64px;
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --navy:#0F2A5E;--blue:#1B4FBF;--blue-light:#2563EB;--blue-pale:#EFF4FF;--blue-mid:#BFCFEE;
+      --gold:#C9A84C;--white:#FFFFFF;
+      --gray-50:#F8FAFC;--gray-100:#F1F5F9;--gray-200:#E2E8F0;--gray-300:#CBD5E1;
+      --gray-500:#64748B;--gray-700:#334155;--gray-900:#0F172A;
+      --green:#16A34A;--green-pale:#F0FDF4;
+      --red:#DC2626;--red-pale:#FEF2F2;
+      --yellow:#D97706;--yellow-pale:#FFFBEB;
+      --sidebar-w:256px;--topbar-h:64px;
     }
-    body { font-family:'Inter',sans-serif; background:#F8FAFC; }
+    html,body{height:100%;font-family:'Inter',sans-serif;background:var(--gray-50);color:var(--gray-700)}
 
     /* SIDEBAR */
-    .sidebar {
-      position:fixed; top:0; left:0; width:var(--sidebar-w); height:100vh;
-      background:var(--navy); display:flex; flex-direction:column; z-index:1040;
-      transition:transform .3s ease;
-    }
-    .sidebar-logo { padding:20px; border-bottom:1px solid rgba(255,255,255,.08); }
-    .logo-icon { width:40px; height:40px; background:var(--gold); border-radius:10px; display:flex; align-items:center; justify-content:center; }
-    .logo-icon svg { width:22px; height:22px; fill:white; }
-    .logo-name { font-family:'Plus Jakarta Sans',sans-serif; font-size:13px; font-weight:800; color:white; line-height:1.2; }
-    .logo-sub { font-size:10px; color:#BFCFEE; text-transform:uppercase; letter-spacing:.5px; }
-    .sidebar-user { margin:12px; background:rgba(255,255,255,.07); border-radius:12px; padding:10px 12px; }
-    .avatar { width:38px; height:38px; border-radius:10px; background:var(--gold); display:flex; align-items:center; justify-content:center; font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:14px; color:white; flex-shrink:0; }
-    .uname { font-size:13px; font-weight:600; color:white; }
-    .uid { font-size:11px; color:#BFCFEE; }
-    .sidebar-nav { flex:1; padding:8px 12px; overflow-y:auto; }
-    .nav-label { font-size:10px; font-weight:700; color:rgba(191,207,238,.5); text-transform:uppercase; letter-spacing:1px; padding:0 8px; margin-bottom:6px; margin-top:12px; }
-    .nav-item {
-      display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px;
-      font-size:14px; font-weight:500; color:#BFCFEE; border:none; background:none;
-      width:100%; text-align:left; font-family:'Inter',sans-serif; cursor:pointer; transition:background .15s;
-    }
-    .nav-item svg { width:18px; height:18px; flex-shrink:0; }
-    .nav-item:hover { background:rgba(255,255,255,.07); color:white; }
-    .nav-item.active { background:var(--blue-light); color:white; font-weight:600; }
-    .nav-badge { margin-left:auto; background:var(--gold); color:white; font-size:10px; font-weight:700; padding:2px 7px; border-radius:20px; }
-    .sidebar-footer { padding:12px; border-top:1px solid rgba(255,255,255,.08); }
-    .btn-logout { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; border:none; background:none; color:rgba(191,207,238,.6); font-size:13px; cursor:pointer; width:100%; font-family:'Inter',sans-serif; transition:all .15s; }
-    .btn-logout:hover { background:rgba(220,38,38,.15); color:#FCA5A5; }
+    .sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:var(--navy);display:flex;flex-direction:column;z-index:100;transition:transform .3s cubic-bezier(.4,0,.2,1)}
+    .sidebar-logo{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:12px}
+    .logo-icon{width:40px;height:40px;background:var(--gold);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .logo-icon svg{width:22px;height:22px;fill:white}
+    .logo-text .name{font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:800;color:var(--white);line-height:1.2}
+    .logo-text .sub{font-size:10px;color:var(--blue-mid);text-transform:uppercase;letter-spacing:.5px}
+    .sidebar-user{margin:16px 12px;background:rgba(255,255,255,.07);border-radius:12px;padding:12px;display:flex;align-items:center;gap:10px}
+    .avatar{width:38px;height:38px;border-radius:10px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:15px;color:white;flex-shrink:0}
+    .uname{font-size:13px;font-weight:600;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .uid{font-size:11px;color:var(--blue-mid)}
+    .sidebar-nav{flex:1;padding:8px 12px;overflow-y:auto}
+    .nav-section{margin-bottom:20px}
+    .nav-label{font-size:10px;font-weight:700;color:rgba(191,207,238,.5);text-transform:uppercase;letter-spacing:1px;padding:0 8px;margin-bottom:6px}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:background .15s;font-size:14px;font-weight:500;color:var(--blue-mid);border:none;background:none;width:100%;text-align:left;font-family:'Inter',sans-serif}
+    .nav-item svg{width:18px;height:18px;flex-shrink:0}
+    .nav-item:hover{background:rgba(255,255,255,.07);color:white}
+    .nav-item.active{background:var(--blue-light);color:white;font-weight:600}
+    .nav-badge{margin-left:auto;background:var(--gold);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+    .sidebar-footer{padding:12px;border-top:1px solid rgba(255,255,255,.08)}
+    .btn-logout{width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:none;background:none;color:rgba(191,207,238,.6);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s}
+    .btn-logout:hover{background:rgba(220,38,38,.15);color:#FCA5A5}
+    .btn-logout svg{width:17px;height:17px}
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99}
 
     /* TOPBAR */
-    .topbar {
-      position:fixed; top:0; left:var(--sidebar-w); right:0; height:var(--topbar-h);
-      background:white; border-bottom:1px solid #E2E8F0; display:flex; align-items:center;
-      padding:0 24px; z-index:1030; gap:16px;
-    }
-    .topbar-title { font-family:'Plus Jakarta Sans',sans-serif; font-size:17px; font-weight:800; color:var(--navy); flex:1; }
+    .topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:var(--white);border-bottom:1px solid var(--gray-200);display:flex;align-items:center;padding:0 24px;z-index:90;gap:16px}
+    .topbar-hamburger{display:none;background:none;border:none;cursor:pointer;padding:6px;color:var(--gray-500);border-radius:8px}
+    .topbar-hamburger svg{width:22px;height:22px}
+    .topbar-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:17px;font-weight:800;color:var(--navy);flex:1}
+    .topbar-right{display:flex;align-items:center;gap:10px}
+    .topbar-avatar{width:38px;height:38px;border-radius:10px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:14px;color:white}
 
     /* MAIN */
-    .main { margin-left:var(--sidebar-w); padding-top:var(--topbar-h); min-height:100vh; }
-    .content { padding:28px 28px 48px; display:none; }
-    .content.active { display:block; }
+    .main{margin-left:var(--sidebar-w);padding-top:var(--topbar-h);min-height:100vh}
+    .content{padding:28px 28px 48px;display:none}
+    .content.active{display:block}
+    .page-header{margin-bottom:24px}
+    .page-header h2{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:800;color:var(--navy);margin-bottom:4px}
+    .page-header p{font-size:14px;color:var(--gray-500)}
 
-    /* BANNER */
-    .banner { background:linear-gradient(135deg,var(--navy) 0%,var(--blue) 100%); border-radius:16px; overflow:hidden; }
+    /* CARDS */
+    .card{background:var(--white);border-radius:14px;border:1px solid var(--gray-200);overflow:hidden}
+    .card-header{padding:18px 20px 14px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between}
+    .card-header h4{font-size:14px;font-weight:700;color:var(--navy)}
+    .card-body{padding:16px 20px}
 
-    /* CARD MATKUL */
-    .matkul-card { border-radius:14px; transition:transform .15s, box-shadow .15s; }
-    .matkul-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(15,42,94,.1); }
+    /* STATS */
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+    .stat-card{background:var(--white);border-radius:14px;padding:20px;border:1px solid var(--gray-200)}
+    .sc-label{font-size:12px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+    .sc-num{font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;color:var(--navy);line-height:1;margin-bottom:6px}
+    .sc-sub{font-size:12px;color:var(--gray-500)}
+    .sc-icon{float:right;width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center}
+    .sc-icon svg{width:18px;height:18px}
+    .ic-blue{background:var(--blue-pale);color:var(--blue)}
+    .ic-green{background:var(--green-pale);color:var(--green)}
+    .ic-yellow{background:var(--yellow-pale);color:var(--yellow)}
+    .ic-gold{background:#FEF3C7;color:var(--gold)}
+
+    /* WELCOME BANNER */
+    .banner{background:linear-gradient(135deg,var(--navy) 0%,var(--blue) 100%);border-radius:16px;padding:28px 32px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden}
+    .banner::after{content:'';position:absolute;right:-40px;top:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.05)}
+    .banner-text h3{font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:800;color:white;margin-bottom:6px}
+    .banner-text p{font-size:13px;color:var(--blue-mid);line-height:1.6}
+    .banner-badge{background:var(--gold);color:white;font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;flex-shrink:0;position:relative;z-index:1}
+
+    /* TWO COL */
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+
+    /* MATKUL LIST (beranda) */
+    .matkul-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--gray-100)}
+    .matkul-row:last-child{border-bottom:none;padding-bottom:0}
+    .mk-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+    .mk-info{flex:1}
+    .mk-name{font-size:13px;font-weight:600;color:var(--gray-900);margin-bottom:2px}
+    .mk-meta{font-size:11px;color:var(--gray-500)}
+    .mk-chip{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;background:var(--blue-pale);color:var(--blue)}
+
+    /* TUGAS MASUK (beranda) */
+    .tugas-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--gray-100)}
+    .tugas-row:last-child{border-bottom:none;padding-bottom:0}
+    .tugas-row .tr-name{font-size:13px;font-weight:600;color:var(--gray-900);flex:1}
+    .tugas-row .tr-meta{font-size:11px;color:var(--gray-500)}
+    .pill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px}
+    .pill-green{background:var(--green-pale);color:var(--green)}
+    .pill-yellow{background:var(--yellow-pale);color:var(--yellow)}
+    .pill-blue{background:var(--blue-pale);color:var(--blue)}
+    .pill-red{background:var(--red-pale);color:var(--red)}
+    .pill-gray{background:var(--gray-100);color:var(--gray-500)}
+
+    /* MATA KULIAH PAGE */
+    .matkul-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+    .matkul-card{background:var(--white);border-radius:14px;border:1px solid var(--gray-200);overflow:hidden;transition:transform .15s,box-shadow .15s;cursor:pointer}
+    .matkul-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(15,42,94,.1)}
+    .mk-cover{height:6px}
+    .mk-body{padding:18px}
+    .mk-kode{font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+    .mk-title{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:12px}
+    .mk-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+    .mks{text-align:center;background:var(--gray-50);border-radius:8px;padding:8px}
+    .mks-num{font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:800;color:var(--navy)}
+    .mks-label{font-size:10px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.3px}
+    .mk-actions{display:flex;gap:8px}
+    .btn-sm{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;border:none;transition:background .15s}
+    .btn-primary{background:var(--blue);color:white}
+    .btn-primary:hover{background:var(--blue-light)}
+    .btn-outline{background:var(--gray-100);color:var(--gray-700)}
+    .btn-outline:hover{background:var(--gray-200)}
+
+    /* UPLOAD TUGAS MODAL */
+    .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;padding:20px}
+    .modal-bg.open{display:flex}
+    .modal{background:white;border-radius:16px;width:100%;max-width:520px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+    .modal-header{padding:20px 24px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between}
+    .modal-header h3{font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:800;color:var(--navy)}
+    .modal-close{background:none;border:none;cursor:pointer;color:var(--gray-500);padding:4px;border-radius:6px}
+    .modal-close:hover{background:var(--gray-100)}
+    .modal-close svg{width:20px;height:20px}
+    .modal-body{padding:20px 24px}
+    .form-group{margin-bottom:16px}
+    .form-group label{display:block;font-size:12px;font-weight:600;color:var(--gray-500);margin-bottom:5px}
+    .form-input{width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s;background:white;color:var(--gray-700)}
+    .form-input:focus{border-color:var(--blue-light)}
+    textarea.form-input{resize:vertical;min-height:80px}
+    .modal-footer{padding:16px 24px;border-top:1px solid var(--gray-100);display:flex;justify-content:flex-end;gap:10px}
+    .btn-md{padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;border:none}
+
+    /* ABSENSI PAGE */
+    .absensi-matkul-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+    .tab-btn{padding:7px 16px;border-radius:20px;border:1.5px solid var(--gray-200);font-size:13px;font-weight:600;cursor:pointer;background:white;color:var(--gray-500);font-family:'Inter',sans-serif;transition:all .15s}
+    .tab-btn.active{background:var(--navy);color:white;border-color:var(--navy)}
+    .absensi-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+    .pertemuan-list{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+    .pertemuan-card{background:white;border-radius:12px;border:1px solid var(--gray-200);overflow:hidden}
+    .pertemuan-card-header{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+    .pertemuan-card-header:hover{background:var(--gray-50)}
+    .pertemuan-card-body{border-top:1px solid var(--gray-100);padding:16px}
+    .ptm-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+    .ptm-badge.aktif{background:var(--green-pale);color:var(--green)}
+    .ptm-badge.ditutup{background:var(--gray-100);color:var(--gray-500)}
+    .absensi-table-wrap{background:white;border-radius:14px;border:1px solid var(--gray-200);overflow:hidden}
+    table.abs-table{width:100%;border-collapse:collapse;font-size:13px}
+    .abs-table th{padding:12px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px;background:var(--gray-50);border-bottom:1px solid var(--gray-200)}
+    .abs-table td{padding:12px 16px;border-bottom:1px solid var(--gray-100)}
+    .abs-table tr:last-child td{border-bottom:none}
+    .abs-table tr:hover td{background:var(--gray-50)}
+    .abs-select{padding:5px 10px;border:1.5px solid var(--gray-200);border-radius:6px;font-size:12px;font-family:'Inter',sans-serif;outline:none;cursor:pointer;background:white}
+    .abs-select:focus{border-color:var(--blue-light)}
+    .status-pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
+    .status-pill.hadir{background:var(--green-pale);color:var(--green)}
+    .status-pill.izin{background:#FEF3C7;color:#D97706}
+    .status-pill.tidak_hadir{background:var(--red-pale);color:var(--red)}
+    .status-pill.menunggu{background:var(--gray-100);color:var(--gray-500)}
 
     /* DISKUSI */
-    .diskusi-room { border-bottom:1px solid #F1F5F9; cursor:pointer; transition:background .15s; }
-    .diskusi-room:hover { background:#F8FAFC; }
-    .diskusi-room.active { background:var(--blue-pale); }
-    .diskusi-room.active .dr-name { color:var(--blue); }
-    .chat-messages { height:calc(100vh - var(--topbar-h) - 260px); min-height:300px; overflow-y:auto; }
-    .msg-bubble { max-width:65%; padding:10px 14px; border-radius:14px; font-size:13px; line-height:1.55; }
-    .msg-other .msg-bubble { background:#F1F5F9; border-bottom-left-radius:4px; }
-    .msg-me .msg-bubble { background:var(--navy); color:white; border-bottom-right-radius:4px; }
-
-    /* PERTEMUAN */
-    .pertemuan-card { border-radius:12px; }
-    .pertemuan-header { cursor:pointer; user-select:none; }
-    .pertemuan-header:hover { background:#F8FAFC; }
-
-    /* STATUS PILLS */
-    .status-pill { display:inline-block; padding:3px 9px; border-radius:20px; font-size:11px; font-weight:700; }
-    .status-hadir { background:#F0FDF4; color:#16A34A; }
-    .status-izin { background:#FFFBEB; color:#D97706; }
-    .status-sakit { background:#FEF3C7; color:#D97706; }
-    .status-tidak_hadir { background:#FEF2F2; color:#DC2626; }
-    .status-menunggu { background:#F1F5F9; color:#64748B; }
-    .status-aktif { background:#EFF4FF; color:var(--blue); }
-    .status-ditutup { background:#F1F5F9; color:#64748B; }
-    .status-selesai { background:#F0FDF4; color:#16A34A; }
+    .diskusi-layout{display:grid;grid-template-columns:260px 1fr;gap:20px;height:calc(100vh - var(--topbar-h) - 80px);min-height:500px}
+    .diskusi-rooms{background:white;border-radius:14px;border:1px solid var(--gray-200);overflow:hidden;display:flex;flex-direction:column}
+    .diskusi-rooms-header{padding:16px 18px;border-bottom:1px solid var(--gray-100);font-size:13px;font-weight:700;color:var(--navy)}
+    .diskusi-room-list{flex:1;overflow-y:auto}
+    .diskusi-room{padding:14px 18px;border-bottom:1px solid var(--gray-100);cursor:pointer;transition:background .15s}
+    .diskusi-room:hover{background:var(--gray-50)}
+    .diskusi-room.active{background:var(--blue-pale)}
+    .dr-name{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:2px}
+    .dr-last{font-size:11px;color:var(--gray-500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .diskusi-room.active .dr-name{color:var(--blue)}
+    .diskusi-chat{background:white;border-radius:14px;border:1px solid var(--gray-200);overflow:hidden;display:flex;flex-direction:column}
+    .chat-header{padding:16px 20px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:12px}
+    .chat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+    .chat-icon svg{width:18px;height:18px}
+    .chat-title-text{font-size:14px;font-weight:700;color:var(--navy)}
+    .chat-sub{font-size:11px;color:var(--gray-500)}
+    .chat-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+    .chat-msg{display:flex;gap:10px}
+    .chat-msg.me{flex-direction:row-reverse}
+    .msg-av{width:32px;height:32px;border-radius:8px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:white;flex-shrink:0;align-self:flex-end}
+    .msg-av.mhs{background:var(--blue-light)}
+    .msg-bubble{max-width:65%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.55}
+    .chat-msg:not(.me) .msg-bubble{background:var(--gray-100);color:var(--gray-700);border-bottom-left-radius:4px}
+    .chat-msg.me .msg-bubble{background:var(--navy);color:white;border-bottom-right-radius:4px}
+    .msg-time{font-size:10px;opacity:.6;margin-top:4px}
+    .chat-msg.me .msg-time{text-align:right}
+    .msg-sender{font-size:11px;font-weight:700;color:var(--gray-500);margin-bottom:4px}
+    .chat-input-area{padding:14px 16px;border-top:1px solid var(--gray-100);display:flex;gap:10px;align-items:flex-end}
+    .chat-input{flex:1;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:13px;font-family:'Inter',sans-serif;resize:none;outline:none;transition:border-color .2s;max-height:100px}
+    .chat-input:focus{border-color:var(--blue-light)}
+    .btn-send{width:40px;height:40px;background:var(--navy);color:white;border:none;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0}
+    .btn-send:hover{background:var(--blue)}
+    .btn-send svg{width:18px;height:18px}
 
     /* TOAST */
-    #toast { position:fixed; bottom:24px; right:24px; z-index:9999; min-width:200px; }
+    .toast{position:fixed;bottom:24px;right:24px;background:var(--gray-900);color:white;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;opacity:0;transform:translateY(10px);transition:all .25s;pointer-events:none}
+    .toast.show{opacity:1;transform:translateY(0)}
 
     /* MOBILE */
-    .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1039; }
-    @media(max-width:768px) {
-      .sidebar { transform:translateX(-100%); }
-      .sidebar.open { transform:translateX(0); }
-      .sidebar-overlay.open { display:block; }
-      .topbar { left:0; padding:0 16px; }
-      .main { margin-left:0; }
-      .content { padding:16px 14px 40px; }
-      .chat-messages { height:320px; }
+    @media(max-width:768px){
+      .sidebar{transform:translateX(-100%)}
+      .sidebar.open{transform:translateX(0)}
+      .sidebar-overlay.open{display:block}
+      .topbar{left:0;padding:0 16px}
+      .topbar-hamburger{display:flex;align-items:center;justify-content:center}
+      .main{margin-left:0}
+      .content{padding:20px 16px 40px}
+      .stats-grid{grid-template-columns:repeat(2,1fr)}
+      .two-col{grid-template-columns:1fr}
+      .matkul-grid{grid-template-columns:1fr}
+      .diskusi-layout{grid-template-columns:1fr;height:auto}
+      .diskusi-rooms{max-height:220px}
+      .banner-badge{display:none}
     }
   </style>
 </head>
 <body>
 
 <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+<div class="toast" id="toast"></div>
 
-<!-- TOAST -->
-<div id="toast"></div>
-
+<!-- MODAL UPLOAD TUGAS -->
 <!-- MODAL: TAMBAH / EDIT TUGAS -->
-<div class="modal fade" id="modal-tugas" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title fw-bold" id="modal-tugas-title">Upload Tugas</h5>
-        <button type="button" class="btn-close" onclick="closeModal()"></button>
+<div class="modal-bg" id="modal-tugas">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-tugas-title">Upload Tugas</h3>
+      <button class="modal-close" onclick="closeModal()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="f-tugas-id"/>
+      <div class="form-group">
+        <label>Mata Kuliah</label>
+        <select class="form-input" id="f-matkul">
+          <option value="">Pilih mata kuliah...</option>
+        </select>
       </div>
-      <div class="modal-body">
-        <input type="hidden" id="f-tugas-id"/>
-        <div class="mb-3">
-          <label class="form-label fw-semibold small text-muted">Mata Kuliah</label>
-          <select class="form-select" id="f-matkul">
-            <option value="">Pilih mata kuliah...</option>
-          </select>
-        </div>
-        <div class="mb-3">
-          <label class="form-label fw-semibold small text-muted">Judul Tugas</label>
-          <input type="text" class="form-control" id="f-judul" placeholder="cth. Tugas 4 — Relasi Database"/>
-        </div>
-        <div class="mb-3">
-          <label class="form-label fw-semibold small text-muted">Deskripsi / Instruksi</label>
-          <textarea class="form-control" id="f-deskripsi" rows="3" placeholder="Jelaskan instruksi tugas..."></textarea>
-        </div>
-        <div class="mb-1">
-          <label class="form-label fw-semibold small text-muted">Deadline</label>
-          <input type="datetime-local" class="form-control" id="f-deadline"/>
-        </div>
+      <div class="form-group">
+        <label>Judul Tugas</label>
+        <input type="text" class="form-input" id="f-judul" placeholder="cth. Tugas 4 — Relasi Database"/>
       </div>
-      <div class="modal-footer">
-        <button class="btn btn-light" onclick="closeModal()">Batal</button>
-        <button class="btn btn-primary" onclick="submitTugas()" id="btn-submit-tugas">Upload Tugas</button>
+      <div class="form-group">
+        <label>Deskripsi / Instruksi</label>
+        <textarea class="form-input" id="f-deskripsi" rows="3" placeholder="Jelaskan instruksi tugas..." style="resize:vertical;min-height:80px"></textarea>
       </div>
+      <div class="form-group">
+        <label>Deadline</label>
+        <input type="datetime-local" class="form-input" id="f-deadline"/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-md btn-outline" onclick="closeModal()" style="background:var(--gray-100);color:var(--gray-700)">Batal</button>
+      <button class="btn-md btn-primary" onclick="submitTugas()" style="background:var(--blue);color:white" id="btn-submit-tugas">Upload Tugas</button>
     </div>
   </div>
 </div>
 
 <!-- MODAL: KONFIRMASI HAPUS -->
-<div class="modal fade" id="modal-confirm" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered modal-sm">
-    <div class="modal-content text-center">
-      <div class="modal-body pt-4">
-        <div class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-3" style="width:56px;height:56px;background:#FEF2F2;">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="#DC2626"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-        </div>
-        <h5 class="fw-bold" style="color:var(--navy)">Hapus Tugas?</h5>
-        <p id="confirm-msg" class="text-muted small mb-0">Tugas ini akan dihapus secara permanen.</p>
+<div class="modal-bg" id="modal-confirm">
+  <div class="modal" style="max-width:380px;text-align:center">
+    <div class="modal-body" style="padding:28px 24px">
+      <div style="width:56px;height:56px;border-radius:14px;background:var(--red-pale);display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--red)"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
       </div>
-      <div class="modal-footer justify-content-center border-0 pb-4">
-        <button class="btn btn-light" onclick="closeConfirm()">Batal</button>
-        <button class="btn btn-danger" id="btn-confirm-ok">Ya, Hapus</button>
-      </div>
+      <h3 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:17px;font-weight:800;color:var(--navy);margin-bottom:8px">Hapus Tugas?</h3>
+      <p id="confirm-msg" style="font-size:13px;color:var(--gray-500);line-height:1.6">Tugas ini akan dihapus secara permanen.</p>
     </div>
-  </div>
-</div>
-
-<!-- MODAL: BUAT PERTEMUAN -->
-<div class="modal fade" id="modal-pertemuan" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title fw-bold">Buat Pertemuan Baru</h5>
-        <button type="button" class="btn-close" onclick="closeModalPertemuan()"></button>
-      </div>
-      <div class="modal-body">
-        <div class="mb-3">
-          <label class="form-label fw-semibold small text-muted">Mata Kuliah</label>
-          <select class="form-select" id="ptm-matkul"><option value="">-- Pilih Mata Kuliah --</option></select>
-        </div>
-        <div class="mb-3">
-          <label class="form-label fw-semibold small text-muted">Judul / Topik Pertemuan</label>
-          <input type="text" class="form-control" id="ptm-judul" placeholder="cth. Pertemuan 1 — Pengenalan Atletik"/>
-        </div>
-        <div class="mb-3">
-          <label class="form-label fw-semibold small text-muted">Tanggal &amp; Waktu</label>
-          <input type="datetime-local" class="form-control" id="ptm-tanggal"/>
-        </div>
-        <div class="mb-2">
-          <label class="form-label fw-semibold small text-muted">Keterangan (opsional)</label>
-          <textarea class="form-control" id="ptm-keterangan" rows="2" placeholder="Informasi tambahan untuk mahasiswa..."></textarea>
-        </div>
-        <div id="ptm-alert" class="alert alert-danger py-2 small d-none mt-2"></div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-light" onclick="closeModalPertemuan()">Batal</button>
-        <button class="btn btn-primary" onclick="submitBuatPertemuan()" id="ptm-submit-btn">Buat Pertemuan</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL: VERIFIKASI KEHADIRAN -->
-<div class="modal fade" id="modal-verifikasi" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title fw-bold" id="verif-modal-title">Verifikasi Kehadiran</h5>
-        <button type="button" class="btn-close" onclick="closeModalVerifikasi()"></button>
-      </div>
-      <div class="modal-body" style="max-height:65vh;overflow-y:auto">
-        <div id="verif-list"></div>
-        <div id="verif-alert" class="alert alert-danger py-2 small d-none mt-2"></div>
-      </div>
-      <div class="modal-footer justify-content-between">
-        <button onclick="tutupPertemuan()" id="btn-tutup-ptm" class="btn btn-secondary btn-sm">🔒 Tutup Pertemuan</button>
-        <button class="btn btn-primary" onclick="closeModalVerifikasi()">Selesai</button>
-      </div>
+    <div class="modal-footer" style="justify-content:center">
+      <button class="btn-md" onclick="closeConfirm()" style="background:var(--gray-100);color:var(--gray-700)">Batal</button>
+      <button class="btn-md" id="btn-confirm-ok" style="background:var(--red);color:white">Ya, Hapus</button>
     </div>
   </div>
 </div>
 
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
-  <div class="sidebar-logo d-flex align-items-center gap-3">
-    <div class="logo-icon flex-shrink-0">
-      <svg viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
-    </div>
-    <div>
-      <div class="logo-name">Unmuh Babel</div>
-      <div class="logo-sub">Portal Dosen</div>
-    </div>
+  <div class="sidebar-logo">
+    <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg></div>
+    <div class="logo-text"><div class="name">Unmuh Babel</div><div class="sub">Portal Dosen</div></div>
   </div>
-  <div class="sidebar-user d-flex align-items-center gap-2">
+  <div class="sidebar-user">
     <div class="avatar" id="sb-avatar">—</div>
-    <div style="overflow:hidden">
-      <div class="uname text-truncate" id="sb-nama">Dosen</div>
-      <div class="uid" id="sb-nip">—</div>
-    </div>
+    <div style="overflow:hidden"><div class="uname" id="sb-nama">Dosen</div><div class="uid" id="sb-nip">—</div></div>
   </div>
   <nav class="sidebar-nav">
-    <div class="nav-label">Menu Utama</div>
-    <button class="nav-item active" onclick="showPage('beranda')">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Beranda
-    </button>
-    <button class="nav-item" onclick="showPage('matkul')">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>Mata Kuliah
-    </button>
-    <button class="nav-item" onclick="showPage('tugas')">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>Tugas
-      <span class="nav-badge" id="nav-badge-tugas" style="display:none">0</span>
-    </button>
-    <button class="nav-item" onclick="showPage('absensi')">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>Absensi
-    </button>
-    <button class="nav-item" onclick="showPage('diskusi')">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>Diskusi
-    </button>
-    <div class="nav-label">Akun</div>
-    <button class="nav-item" onclick="showPage('profil')">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/></svg>Profil
-    </button>
+    <div class="nav-section">
+      <div class="nav-label">Menu Utama</div>
+      <button class="nav-item active" onclick="showPage('beranda')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Beranda
+      </button>
+      <button class="nav-item" onclick="showPage('matkul')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>Mata Kuliah
+      </button>
+      <button class="nav-item" onclick="showPage('tugas')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>Tugas
+        <span class="nav-badge" id="nav-badge-tugas" style="display:none">0</span>
+      </button>
+      <button class="nav-item" onclick="showPage('absensi')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>Absensi
+      </button>
+      <button class="nav-item" onclick="showPage('diskusi')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>Diskusi
+      </button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Akun</div>
+      <button class="nav-item" onclick="showPage('profil')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/></svg>Profil
+      </button>
+    </div>
   </nav>
   <div class="sidebar-footer">
     <button class="btn-logout" onclick="Auth.logout()">
-      <svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>Keluar
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>Keluar
     </button>
   </div>
 </aside>
 
 <!-- TOPBAR -->
 <header class="topbar">
-  <button class="btn d-md-none p-1 me-1" onclick="toggleSidebar()">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+  <button class="topbar-hamburger" onclick="toggleSidebar()">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
   </button>
   <div class="topbar-title" id="topbar-title">Beranda</div>
-  <div class="avatar" id="top-avatar">—</div>
+  <div class="topbar-right">
+    <div class="topbar-avatar" id="top-avatar">—</div>
+  </div>
 </header>
 
 <main class="main">
 
   <!-- BERANDA -->
   <div class="content active" id="page-beranda">
-    <h2 class="fw-bold mb-1" style="font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy)" id="greeting">Selamat Datang</h2>
-    <p class="text-muted small mb-4">Ringkasan aktivitas perkuliahan Anda.</p>
-
-    <div class="banner p-4 mb-4 d-flex align-items-center justify-content-between">
-      <div>
-        <h5 class="fw-bold text-white mb-1" id="banner-nama">Halo, Dosen! 👋</h5>
-        <p class="mb-0 small" style="color:#BFCFEE" id="banner-sub">Memuat informasi...</p>
+    <div class="page-header"><h2 id="greeting">Selamat Datang</h2><p>Ringkasan aktivitas perkuliahan Anda.</p></div>
+    <div class="banner">
+      <div class="banner-text">
+        <h3 id="banner-nama">Halo, Dosen! 👋</h3>
+        <p id="banner-sub">Memuat informasi mata kuliah Anda...</p>
       </div>
-      <span class="badge d-none d-sm-inline fs-6 px-3 py-2" style="background:var(--gold)">Dosen Pengampu</span>
+      <div class="banner-badge">Dosen Pengampu</div>
     </div>
-
-    <div class="row g-3 mb-4">
-      <div class="col-6 col-md-3">
-        <div class="card h-100 border-0 shadow-sm p-3">
-          <div class="d-flex justify-content-between align-items-start">
-            <div>
-              <div class="text-muted small fw-semibold text-uppercase mb-2" style="font-size:11px;letter-spacing:.5px">Mata Kuliah</div>
-              <div class="fw-bold fs-3" style="font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy)" id="stat-matkul">—</div>
-              <div class="text-muted" style="font-size:12px">Diampu</div>
-            </div>
-            <div class="rounded-2 p-2" style="background:var(--blue-pale)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--blue)"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="card h-100 border-0 shadow-sm p-3">
-          <div class="d-flex justify-content-between align-items-start">
-            <div>
-              <div class="text-muted small fw-semibold text-uppercase mb-2" style="font-size:11px;letter-spacing:.5px">Tugas Aktif</div>
-              <div class="fw-bold fs-3" style="font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy)" id="stat-tugas-aktif">—</div>
-              <div class="text-muted" style="font-size:12px">Belum deadline</div>
-            </div>
-            <div class="rounded-2 p-2" style="background:#FFFBEB">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="#D97706"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="card h-100 border-0 shadow-sm p-3">
-          <div class="d-flex justify-content-between align-items-start">
-            <div>
-              <div class="text-muted small fw-semibold text-uppercase mb-2" style="font-size:11px;letter-spacing:.5px">Total Tugas</div>
-              <div class="fw-bold fs-3" style="font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy)" id="stat-tugas-total">—</div>
-              <div class="text-muted" style="font-size:12px">Semua status</div>
-            </div>
-            <div class="rounded-2 p-2" style="background:#F0FDF4">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="#16A34A"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/></svg>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="card h-100 border-0 shadow-sm p-3">
-          <div class="d-flex justify-content-between align-items-start">
-            <div>
-              <div class="text-muted small fw-semibold text-uppercase mb-2" style="font-size:11px;letter-spacing:.5px">Tugas Ditutup</div>
-              <div class="fw-bold fs-3" style="font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy)" id="stat-tugas-tutup">—</div>
-              <div class="text-muted" style="font-size:12px">Lewat deadline</div>
-            </div>
-            <div class="rounded-2 p-2" style="background:#FEF3C7">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--gold)"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="sc-icon ic-blue"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg></div><div class="sc-label">Mata Kuliah</div><div class="sc-num" id="stat-matkul">—</div><div class="sc-sub">Diampu</div></div>
+      <div class="stat-card"><div class="sc-icon ic-yellow"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg></div><div class="sc-label">Tugas Aktif</div><div class="sc-num" id="stat-tugas-aktif">—</div><div class="sc-sub">Belum deadline</div></div>
+      <div class="stat-card"><div class="sc-icon ic-green"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/></svg></div><div class="sc-label">Total Tugas</div><div class="sc-num" id="stat-tugas-total">—</div><div class="sc-sub">Semua status</div></div>
+      <div class="stat-card"><div class="sc-icon ic-gold"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg></div><div class="sc-label">Tugas Ditutup</div><div class="sc-num" id="stat-tugas-tutup">—</div><div class="sc-sub">Lewat deadline</div></div>
     </div>
-
-    <div class="row g-3">
-      <div class="col-md-6">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
-            <span class="fw-bold" style="color:var(--navy);font-size:14px">Mata Kuliah Diampu</span>
-            <a href="#" onclick="showPage('matkul');return false" class="small text-primary fw-semibold text-decoration-none">Lihat semua</a>
-          </div>
-          <div class="card-body" id="beranda-matkul-list">
-            <div class="text-center text-muted py-4 small">Memuat...</div>
-          </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-header"><h4>Mata Kuliah Diampu</h4><a href="#" onclick="showPage('matkul');return false" style="font-size:12px;color:var(--blue-light);text-decoration:none;font-weight:600">Lihat semua</a></div>
+        <div class="card-body" id="beranda-matkul-list">
+          <div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">Memuat...</div>
         </div>
       </div>
-      <div class="col-md-6">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
-            <span class="fw-bold" style="color:var(--navy);font-size:14px">Tugas Terbaru</span>
-            <a href="#" onclick="showPage('tugas');return false" class="small text-primary fw-semibold text-decoration-none">Lihat semua</a>
-          </div>
-          <div class="card-body" id="beranda-tugas-list">
-            <div class="text-center text-muted py-4 small">Memuat...</div>
-          </div>
+      <div class="card">
+        <div class="card-header"><h4>Tugas Terbaru</h4><a href="#" onclick="showPage('tugas');return false" style="font-size:12px;color:var(--blue-light);text-decoration:none;font-weight:600">Lihat semua</a></div>
+        <div class="card-body" id="beranda-tugas-list">
+          <div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">Memuat...</div>
         </div>
       </div>
     </div>
@@ -382,102 +381,132 @@
 
   <!-- MATA KULIAH -->
   <div class="content" id="page-matkul">
-    <div class="d-flex align-items-start justify-content-between mb-4 flex-wrap gap-2">
-      <div>
-        <h2 class="fw-bold mb-1" style="font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy)">Mata Kuliah</h2>
-        <p class="text-muted small mb-0">Mata kuliah yang Anda ampu</p>
-      </div>
-      <button onclick="showPage('tugas')" class="btn btn-primary d-flex align-items-center gap-2">
+    <div class="page-header">
+      <div><h2>Mata Kuliah</h2><p>Mata kuliah yang Anda ampu</p></div>
+      <button onclick="showPage('tugas')" style="display:flex;align-items:center;gap:7px;padding:9px 18px;background:var(--blue);color:white;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>Upload Tugas
       </button>
     </div>
-    <div class="row g-3" id="matkul-grid">
-      <div class="col-12 text-center text-muted py-5 small">Memuat data mata kuliah...</div>
+    <div class="matkul-grid" id="matkul-grid">
+      <div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--gray-500);font-size:13px">Memuat data mata kuliah...</div>
     </div>
   </div>
 
   <!-- TUGAS -->
   <div class="content" id="page-tugas">
-    <div class="d-flex align-items-start justify-content-between mb-3 flex-wrap gap-2">
-      <div>
-        <h2 class="fw-bold mb-1" style="font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy)">Manajemen Tugas</h2>
-        <p class="text-muted small mb-0">Semua tugas yang telah diupload</p>
-      </div>
-      <button onclick="openModal()" class="btn btn-primary d-flex align-items-center gap-2">
+    <div class="page-header">
+      <div><h2>Manajemen Tugas</h2><p>Semua tugas yang telah diupload</p></div>
+      <button onclick="openModal()" style="display:flex;align-items:center;gap:7px;padding:9px 18px;background:var(--blue);color:white;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>Upload Tugas Baru
       </button>
     </div>
-    <div class="d-flex gap-2 mb-3 flex-wrap">
-      <input type="text" class="form-control" style="flex:1;min-width:200px" placeholder="🔍 Cari judul tugas..." oninput="filterTugas()" id="tugas-search"/>
-      <select id="tugas-filter-status" onchange="filterTugas()" class="form-select" style="width:auto">
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+      <input type="text" class="search-input" placeholder="Cari judul tugas..." oninput="filterTugas()" id="tugas-search" style="flex:1;min-width:200px;height:38px;padding:0 14px 0 38px;border:1.5px solid var(--gray-200);border-radius:9px;font-size:13px;outline:none;background:white url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 viewBox=%220 0 24 24%22 fill=%22%2394a3b8%22%3E%3Cpath d=%22M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z%22/%3E%3C/svg%3E') no-repeat 12px center"/>
+      <select id="tugas-filter-status" onchange="filterTugas()" style="height:38px;padding:0 12px;border:1.5px solid var(--gray-200);border-radius:9px;font-size:13px;outline:none;background:white;cursor:pointer;color:var(--gray-700)">
         <option value="">Semua Status</option>
         <option value="aktif">Aktif</option>
         <option value="ditutup">Ditutup</option>
         <option value="selesai">Selesai</option>
       </select>
-      <select id="tugas-filter-matkul" onchange="filterTugas()" class="form-select" style="width:auto">
+      <select id="tugas-filter-matkul" onchange="filterTugas()" style="height:38px;padding:0 12px;border:1.5px solid var(--gray-200);border-radius:9px;font-size:13px;outline:none;background:white;cursor:pointer;color:var(--gray-700)">
         <option value="">Semua Matkul</option>
       </select>
     </div>
-    <div class="d-flex flex-column gap-3" id="tugas-list">
-      <div class="text-center text-muted py-5 small">Memuat data tugas...</div>
+    <div style="display:flex;flex-direction:column;gap:12px" id="tugas-list">
+      <div style="text-align:center;padding:40px;color:var(--gray-500);font-size:13px">Memuat data tugas...</div>
     </div>
   </div>
 
   <!-- ABSENSI -->
   <div class="content" id="page-absensi">
-    <div class="d-flex align-items-start justify-content-between mb-3 flex-wrap gap-2">
-      <div>
-        <h2 class="fw-bold mb-1" style="font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy)">Absensi</h2>
-        <p class="text-muted small mb-0">Kelola pertemuan dan verifikasi kehadiran mahasiswa</p>
-      </div>
-      <button onclick="openModalPertemuan()" class="btn btn-primary flex-shrink-0">+ Buat Pertemuan</button>
+    <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div><h2>Absensi</h2><p>Kelola pertemuan dan verifikasi kehadiran mahasiswa</p></div>
+      <button onclick="openModalPertemuan()" style="padding:9px 18px;background:var(--blue);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;white-space:nowrap;flex-shrink:0">+ Buat Pertemuan</button>
     </div>
-    <div class="mb-3" style="max-width:360px">
-      <label class="form-label fw-semibold small text-muted mb-1">Pilih Mata Kuliah</label>
-      <select class="form-select" id="absensi-tabs" onchange="switchAbsensiByMatkul(this.value)">
-        <option value="">Memuat mata kuliah...</option>
-      </select>
+    <div class="absensi-matkul-tabs" id="absensi-tabs">
+      <div style="color:var(--gray-500);font-size:13px;padding:8px">Memuat mata kuliah...</div>
     </div>
     <div id="absensi-content">
-      <div class="text-center text-muted py-5 small">Pilih mata kuliah di atas untuk melihat daftar pertemuan.</div>
+      <div style="text-align:center;padding:40px;color:var(--gray-500);font-size:13px">Pilih mata kuliah di atas untuk melihat daftar pertemuan.</div>
+    </div>
+  </div>
+
+  <!-- MODAL BUAT PERTEMUAN -->
+  <div class="modal-overlay" id="modal-pertemuan" style="display:none">
+    <div class="modal" style="max-width:440px">
+      <div class="modal-header">
+        <span class="modal-title">Buat Pertemuan Baru</span>
+        <button class="modal-close" onclick="closeModalPertemuan()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Mata Kuliah</label>
+          <select class="form-input" id="ptm-matkul"><option value="">-- Pilih Mata Kuliah --</option></select>
+        </div>
+        <div class="form-group">
+          <label>Judul / Topik Pertemuan</label>
+          <input type="text" class="form-input" id="ptm-judul" placeholder="cth. Pertemuan 1 — Pengenalan Atletik"/>
+        </div>
+        <div class="form-group">
+          <label>Tanggal &amp; Waktu</label>
+          <input type="datetime-local" class="form-input" id="ptm-tanggal"/>
+        </div>
+        <div class="form-group">
+          <label>Keterangan (opsional)</label>
+          <textarea class="form-input" id="ptm-keterangan" rows="2" placeholder="Informasi tambahan untuk mahasiswa..."></textarea>
+        </div>
+        <div id="ptm-alert" style="display:none;padding:10px 14px;border-radius:8px;font-size:13px;background:var(--red-pale);color:var(--red);margin-top:8px"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-md" onclick="closeModalPertemuan()" style="background:var(--gray-100);color:var(--gray-600)">Batal</button>
+        <button class="btn-md" onclick="submitBuatPertemuan()" id="ptm-submit-btn" style="background:var(--blue);color:white">Buat Pertemuan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL VERIFIKASI KEHADIRAN -->
+  <div class="modal-overlay" id="modal-verifikasi" style="display:none">
+    <div class="modal" style="max-width:680px">
+      <div class="modal-header">
+        <span class="modal-title" id="verif-modal-title">Verifikasi Kehadiran</span>
+        <button class="modal-close" onclick="closeModalVerifikasi()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
+      </div>
+      <div class="modal-body">
+        <div id="verif-list"></div>
+        <div id="verif-alert" style="display:none;padding:10px;border-radius:8px;font-size:13px;background:var(--red-pale);color:var(--red);margin-top:8px"></div>
+      </div>
+      <div class="modal-footer" style="justify-content:space-between">
+        <button onclick="tutupPertemuan()" id="btn-tutup-ptm" style="padding:9px 16px;background:var(--gray-200);color:var(--gray-700);border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">🔒 Tutup Pertemuan</button>
+        <button class="btn-md" onclick="closeModalVerifikasi()" style="background:var(--blue);color:white">Selesai</button>
+      </div>
     </div>
   </div>
 
   <!-- DISKUSI -->
   <div class="content" id="page-diskusi">
-    <h2 class="fw-bold mb-1" style="font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy)">Diskusi</h2>
-    <p class="text-muted small mb-3">Ruang diskusi real-time dengan mahasiswa per mata kuliah</p>
-    <div class="row g-3" style="height:calc(100vh - var(--topbar-h) - 140px);min-height:500px">
-      <div class="col-md-3 d-flex flex-column">
-        <div class="card border-0 shadow-sm flex-grow-1 overflow-hidden d-flex flex-column">
-          <div class="card-header bg-white border-bottom fw-bold py-3" style="font-size:13px;color:var(--navy)">📚 Ruang Diskusi</div>
-          <div class="flex-grow-1 overflow-auto" id="diskusi-room-list">
-            <div class="p-3 text-muted small">Memuat ruang diskusi...</div>
-          </div>
+    <div class="page-header"><h2>Diskusi</h2><p>Ruang diskusi real-time dengan mahasiswa per mata kuliah</p></div>
+    <div class="diskusi-layout">
+      <div class="diskusi-rooms">
+        <div class="diskusi-rooms-header">📚 Ruang Diskusi</div>
+        <div class="diskusi-room-list" id="diskusi-room-list">
+          <div style="padding:16px;font-size:13px;color:var(--gray-500)">Memuat ruang diskusi...</div>
         </div>
       </div>
-      <div class="col-md-9 d-flex flex-column">
-        <div class="card border-0 shadow-sm flex-grow-1 overflow-hidden d-flex flex-column">
-          <div class="card-header bg-white border-bottom d-flex align-items-center gap-3 py-3">
-            <div class="rounded-2 p-2" style="background:var(--blue-pale)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--blue-light)"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
-            </div>
-            <div class="flex-grow-1">
-              <div class="fw-bold" style="font-size:14px;color:var(--navy)" id="chat-title">Pilih ruang diskusi</div>
-              <div class="text-muted" style="font-size:11px" id="chat-sub">—</div>
-            </div>
-            <button onclick="refreshChat()" id="btn-refresh-chat" class="btn btn-light btn-sm d-none">🔄</button>
+      <div class="diskusi-chat">
+        <div class="chat-header">
+          <div class="chat-icon" style="background:var(--blue-pale)"><svg viewBox="0 0 24 24" fill="var(--blue-light)"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div>
+          <div style="flex:1">
+            <div class="chat-title-text" id="chat-title">Pilih ruang diskusi</div>
+            <div class="chat-sub" id="chat-sub">—</div>
           </div>
-          <div class="chat-messages flex-grow-1 p-3 d-flex flex-column gap-3" id="chat-messages">
-            <div class="text-center text-muted py-5 small">Pilih mata kuliah untuk memulai diskusi.</div>
-          </div>
-          <div class="border-top d-flex gap-2 p-3 align-items-end" id="chat-input-area" style="display:none!important">
-            <textarea class="form-control" id="chat-input" rows="1" placeholder="Ketik pesan untuk mahasiswa..." onkeydown="handleChatKey(event)" style="resize:none;max-height:100px"></textarea>
-            <button onclick="sendMessage()" class="btn d-flex align-items-center justify-content-center flex-shrink-0" style="width:40px;height:40px;background:var(--navy);color:white;border-radius:10px">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
-            </button>
-          </div>
+          <button onclick="refreshChat()" id="btn-refresh-chat" style="display:none;padding:6px 10px;background:var(--gray-100);border:none;border-radius:8px;cursor:pointer;font-size:12px;color:var(--gray-600)" title="Refresh pesan">🔄</button>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+          <div style="text-align:center;padding:40px;color:var(--gray-500);font-size:13px">Pilih mata kuliah untuk memulai diskusi.</div>
+        </div>
+        <div class="chat-input-area" id="chat-input-area" style="display:none">
+          <textarea class="chat-input" id="chat-input" rows="1" placeholder="Ketik pesan untuk mahasiswa..." onkeydown="handleChatKey(event)"></textarea>
+          <button class="btn-send" onclick="sendMessage()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg></button>
         </div>
       </div>
     </div>
@@ -485,40 +514,30 @@
 
   <!-- PROFIL -->
   <div class="content" id="page-profil">
-    <h2 class="fw-bold mb-1" style="font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy)">Profil Saya</h2>
-    <p class="text-muted small mb-4">Informasi akun dan data kepegawaian</p>
+    <div class="page-header"><h2>Profil Saya</h2><p>Informasi akun dan data kepegawaian</p></div>
     <div style="max-width:560px">
-      <div class="card border-0 shadow-sm mb-3">
-        <div class="card-header bg-white border-bottom fw-bold py-3" style="font-size:14px;color:var(--navy)">Data Diri</div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header"><h4>Data Diri</h4></div>
         <div class="card-body">
-          <div class="d-flex align-items-center gap-3 mb-4">
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
             <div class="avatar" id="profil-avatar" style="width:60px;height:60px;border-radius:14px;font-size:22px">—</div>
-            <div>
-              <div class="fw-bold fs-5" style="color:var(--navy)" id="profil-nama">—</div>
-              <div class="text-muted small" id="profil-nip">—</div>
-            </div>
+            <div><div style="font-size:17px;font-weight:700;color:var(--navy)" id="profil-nama">—</div><div style="font-size:13px;color:var(--gray-500)" id="profil-nip">—</div></div>
           </div>
-          <table class="table table-sm small mb-0">
-            <tr><td class="text-muted" style="width:40%">Role</td><td class="fw-semibold">Dosen</td></tr>
-            <tr><td class="text-muted">Jurusan</td><td class="fw-semibold" id="profil-jurusan">—</td></tr>
-            <tr class="border-0"><td class="text-muted">Mata Kuliah Diampu</td><td class="fw-semibold" id="profil-mk">—</td></tr>
+          <table style="width:100%;border-collapse:collapse;font-size:13px">
+            <tr style="border-bottom:1px solid var(--gray-100)"><td style="padding:10px 0;color:var(--gray-500);width:40%">Role</td><td style="padding:10px 0;font-weight:600">Dosen</td></tr>
+            <tr style="border-bottom:1px solid var(--gray-100)"><td style="padding:10px 0;color:var(--gray-500)">Jurusan</td><td style="padding:10px 0;font-weight:600" id="profil-jurusan">—</td></tr>
+            <tr><td style="padding:10px 0;color:var(--gray-500)">Mata Kuliah Diampu</td><td style="padding:10px 0;font-weight:600" id="profil-mk">—</td></tr>
           </table>
         </div>
       </div>
-      <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white border-bottom fw-bold py-3" style="font-size:14px;color:var(--navy)">Ganti Password</div>
+      <div class="card">
+        <div class="card-header"><h4>Ganti Password</h4></div>
         <div class="card-body">
-          <div id="pass-alert" class="alert alert-danger py-2 small d-none"></div>
-          <div id="pass-success" class="alert alert-success py-2 small d-none"></div>
-          <div class="mb-3">
-            <label class="form-label fw-semibold small text-muted">Password Lama</label>
-            <input type="password" id="old-pass" class="form-control" placeholder="••••••••"/>
-          </div>
-          <div class="mb-3">
-            <label class="form-label fw-semibold small text-muted">Password Baru</label>
-            <input type="password" id="new-pass" class="form-control" placeholder="••••••••"/>
-          </div>
-          <button onclick="gantiPassword()" class="btn btn-primary">Simpan Password</button>
+          <div id="pass-alert" style="display:none;margin-bottom:12px;padding:10px 14px;border-radius:8px;font-size:13px;background:var(--red-pale);color:var(--red);border:1px solid #FECACA"></div>
+          <div id="pass-success" style="display:none;margin-bottom:12px;padding:10px 14px;border-radius:8px;font-size:13px;background:var(--green-pale);color:var(--green);border:1px solid #BBF7D0"></div>
+          <div style="margin-bottom:12px"><label style="font-size:12px;font-weight:600;color:var(--gray-500);display:block;margin-bottom:4px">Password Lama</label><input type="password" id="old-pass" placeholder="••••••••" style="width:100%;height:42px;padding:0 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:Inter,sans-serif;outline:none"/></div>
+          <div style="margin-bottom:16px"><label style="font-size:12px;font-weight:600;color:var(--gray-500);display:block;margin-bottom:4px">Password Baru</label><input type="password" id="new-pass" placeholder="••••••••" style="width:100%;height:42px;padding:0 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:Inter,sans-serif;outline:none"/></div>
+          <button onclick="gantiPassword()" style="padding:10px 24px;background:var(--blue);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">Simpan Password</button>
         </div>
       </div>
     </div>
@@ -526,33 +545,21 @@
 
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/auth.js"></script>
 <script>
   let currentUser = null;
-  let myMatkul    = [];
-  let allTugas    = [];
-  let allMhsList  = [];
+  let myMatkul    = []; // dari currentUser.mata_kuliah
+  let allTugas    = []; // dari API
+  let allMhsList  = []; // semua mahasiswa di jurusan yang sama
   let activeAbsensiMatkul = null;
-  let pertemuanData = [];
-  let verifPertemuanId = null;
-  let allMhsJurusan = [];
 
   const pages  = ['beranda','matkul','tugas','absensi','diskusi','profil'];
   const titles = {beranda:'Beranda',matkul:'Mata Kuliah',tugas:'Manajemen Tugas',absensi:'Absensi',diskusi:'Diskusi',profil:'Profil Saya'};
   const CARD_COLORS = ['var(--blue-light)','var(--gold)','#DB2777','#7C3AED','#16A34A','#0891B2','#EA580C'];
 
-  // Bootstrap modal instances
-  let bsModalTugas, bsModalConfirm, bsModalPertemuan, bsModalVerifikasi;
-
   // ─── INIT ──────────────────────────────────────────────────────────────────
 
   (async () => {
-    bsModalTugas      = new bootstrap.Modal(document.getElementById('modal-tugas'));
-    bsModalConfirm    = new bootstrap.Modal(document.getElementById('modal-confirm'));
-    bsModalPertemuan  = new bootstrap.Modal(document.getElementById('modal-pertemuan'));
-    bsModalVerifikasi = new bootstrap.Modal(document.getElementById('modal-verifikasi'));
-
     currentUser = await Auth.requireLogin(['dosen']);
     if (!currentUser) return;
 
@@ -571,11 +578,16 @@
     document.getElementById('greeting').textContent     = `Selamat Datang, ${firstName}`;
     document.getElementById('banner-nama').textContent  = `Halo, ${firstName}! 👋`;
 
+    // Isi dropdown matkul di modal tugas
     populateMatkulDropdown();
+    // Isi filter tugas
     updateTugasMatkulFilter();
+    // Setup absensi tabs
     renderAbsensiTabs();
+    // Setup diskusi rooms
     renderDiskusiRooms();
 
+    // Load data dari API
     await Promise.all([loadTugas(), loadMahasiswaJurusan()]);
     showPage('beranda');
   })();
@@ -597,15 +609,18 @@
   }
 
   function statusPill(status) {
+    const map = { aktif:'pill-blue', ditutup:'pill-yellow', selesai:'pill-green' };
     const label = { aktif:'Aktif', ditutup:'Ditutup', selesai:'Selesai' };
-    return `<span class="status-pill status-${status}">${label[status]||status}</span>`;
+    return `<span class="pill ${map[status]||'pill-gray'}">${label[status]||status}</span>`;
   }
 
   // ─── TUGAS ────────────────────────────────────────────────────────────────
 
   async function loadTugas() {
     try {
-      const res  = await fetch(`/api/tugas/list?dosen_id=${currentUser.id}`, { headers: authHeaders() });
+      const res  = await fetch(`/api/tugas/list?dosen_id=${currentUser.id}`, {
+        headers: authHeaders(),
+      });
       const data = await res.json();
       if (!res.ok) { showToast('Gagal memuat tugas: ' + (data.error||'')); return; }
       allTugas = data.tugas || [];
@@ -624,7 +639,7 @@
     document.getElementById('stat-tugas-total').textContent = allTugas.length;
     document.getElementById('stat-tugas-tutup').textContent = tutup;
     const bannerSub = myMatkul.length
-      ? `Anda mengampu <strong class="text-white">${myMatkul.length} mata kuliah</strong>. Terdapat <strong class="text-white">${aktif} tugas aktif</strong> saat ini.`
+      ? `Anda mengampu <strong style="color:white">${myMatkul.length} mata kuliah</strong>. Terdapat <strong style="color:white">${aktif} tugas aktif</strong> saat ini.`
       : 'Belum ada mata kuliah yang ditetapkan. Hubungi admin.';
     document.getElementById('banner-sub').innerHTML = bannerSub;
   }
@@ -639,26 +654,26 @@
   function renderTugas(list) {
     const container = document.getElementById('tugas-list');
     if (!list.length) {
-      container.innerHTML = '<div class="text-center text-muted py-5 small">Belum ada tugas. Klik <strong>Upload Tugas Baru</strong> untuk memulai.</div>';
+      container.innerHTML = '<div style="text-align:center;padding:48px;color:var(--gray-500);font-size:13px">Belum ada tugas. Klik <strong>Upload Tugas Baru</strong> untuk memulai.</div>';
       return;
     }
-    const statusBg = { aktif:'var(--blue-pale)', ditutup:'#FFFBEB', selesai:'#F0FDF4' };
-    const statusFill = { aktif:'var(--blue)', ditutup:'#D97706', selesai:'#16A34A' };
+    const statusColor = { aktif:'var(--blue-pale)', ditutup:'var(--yellow-pale)', selesai:'var(--green-pale)' };
+    const statusIcon  = { aktif:'var(--blue)', ditutup:'var(--yellow)', selesai:'var(--green)' };
     container.innerHTML = list.map(t => `
-      <div class="card border-0 shadow-sm">
-        <div class="card-body d-flex align-items-center gap-3 flex-wrap py-3">
-          <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width:44px;height:44px;background:${statusBg[t.status]||'#F1F5F9'}">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="${statusFill[t.status]||'#64748B'}"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+      <div class="card">
+        <div style="padding:18px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <div style="width:44px;height:44px;border-radius:12px;background:${statusColor[t.status]||'var(--gray-100)'};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="${statusIcon[t.status]||'var(--gray-500)'}"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
           </div>
-          <div class="flex-grow-1" style="min-width:160px">
-            <div class="fw-bold mb-1" style="font-size:14px;color:var(--navy)">${t.judul}</div>
-            <div class="text-muted" style="font-size:12px">${t.matkul} · Deadline: ${deadlineLabel(t.deadline)}</div>
-            ${t.deskripsi ? `<div class="text-muted text-truncate" style="font-size:12px;max-width:400px">${t.deskripsi}</div>` : ''}
+          <div style="flex:1;min-width:160px">
+            <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:3px">${t.judul}</div>
+            <div style="font-size:12px;color:var(--gray-500)">${t.matkul} · Deadline: ${deadlineLabel(t.deadline)}</div>
+            ${t.deskripsi ? `<div style="font-size:12px;color:var(--gray-500);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:400px">${t.deskripsi}</div>` : ''}
           </div>
-          <div class="d-flex align-items-center gap-2 flex-wrap">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             ${statusPill(t.status)}
-            <button onclick='editTugas(${JSON.stringify(t).replace(/'/g,"&#39;")})' class="btn btn-sm" style="background:var(--blue-pale);color:var(--blue);font-size:12px">Edit</button>
-            <button onclick="deleteTugas('${t.id}','${t.judul.replace(/'/g,&quot;\\\'&quot;)}')" class="btn btn-sm" style="background:#FEF2F2;color:#DC2626;font-size:12px">Hapus</button>
+            <button onclick='editTugas(${JSON.stringify(t).replace(/'/g,"&#39;")})' style="padding:5px 12px;background:var(--blue-pale);color:var(--blue);border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">Edit</button>
+            <button onclick="deleteTugas('${t.id}','${t.judul.replace(/'/g,"\\'")}')'" style="padding:5px 12px;background:var(--red-pale);color:var(--red);border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">Hapus</button>
           </div>
         </div>
       </div>`).join('');
@@ -668,15 +683,12 @@
     const el = document.getElementById('beranda-tugas-list');
     const recent = [...list].sort((a,b) => new Date(b.created_at)-new Date(a.created_at)).slice(0,4);
     if (!recent.length) {
-      el.innerHTML = '<div class="text-center text-muted py-4 small">Belum ada tugas diupload.</div>';
+      el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">Belum ada tugas diupload.</div>';
       return;
     }
     el.innerHTML = recent.map(t => `
-      <div class="d-flex align-items-center gap-3 py-2 border-bottom">
-        <div class="flex-grow-1">
-          <div class="fw-semibold" style="font-size:13px;color:#0F172A">${t.judul}</div>
-          <div class="text-muted" style="font-size:11px">${t.matkul} · ${deadlineLabel(t.deadline)}</div>
-        </div>
+      <div class="tugas-row">
+        <div style="flex:1"><div class="tr-name">${t.judul}</div><div class="tr-meta">${t.matkul} · ${deadlineLabel(t.deadline)}</div></div>
         ${statusPill(t.status)}
       </div>`).join('');
   }
@@ -712,7 +724,7 @@
       document.getElementById('f-matkul').value   = '';
       document.getElementById('f-deadline').value = '';
     }
-    bsModalTugas.show();
+    document.getElementById('modal-tugas').classList.add('open');
   }
 
   function editTugas(t) {
@@ -720,6 +732,7 @@
     document.getElementById('f-matkul').value    = t.matkul;
     document.getElementById('f-judul').value     = t.judul;
     document.getElementById('f-deskripsi').value = t.deskripsi||'';
+    // format deadline for datetime-local input
     if (t.deadline) {
       const d = new Date(t.deadline);
       const local = new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,16);
@@ -728,7 +741,7 @@
     openModal('edit');
   }
 
-  function closeModal() { bsModalTugas.hide(); }
+  function closeModal() { document.getElementById('modal-tugas').classList.remove('open'); }
 
   async function submitTugas() {
     const id       = document.getElementById('f-tugas-id').value;
@@ -764,29 +777,26 @@
         await loadTugas();
       } catch { showToast('Tidak dapat terhubung ke server.'); }
     };
-    bsModalConfirm.show();
+    document.getElementById('modal-confirm').classList.add('open');
   }
 
-  function closeConfirm() { bsModalConfirm.hide(); }
+  function closeConfirm() { document.getElementById('modal-confirm').classList.remove('open'); }
 
-  // ─── MATA KULIAH ──────────────────────────────────────────────────────────
+  // ─── MATA KULIAH (tampilan kartu) ─────────────────────────────────────────
 
   function renderBerandaMatkul() {
     const el = document.getElementById('beranda-matkul-list');
     if (!myMatkul.length) {
-      el.innerHTML = '<div class="text-center text-muted py-4 small">Belum ada mata kuliah yang ditetapkan.</div>';
+      el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">Belum ada mata kuliah yang ditetapkan.</div>';
       return;
     }
     el.innerHTML = myMatkul.map((mk, i) => {
       const color = CARD_COLORS[i % CARD_COLORS.length];
       const count = allTugas.filter(t => t.matkul === mk).length;
-      return `<div class="d-flex align-items-center gap-3 py-2 border-bottom">
-        <div class="rounded-1 flex-shrink-0" style="width:10px;height:10px;background:${color}"></div>
-        <div class="flex-grow-1">
-          <div class="fw-semibold" style="font-size:13px;color:#0F172A">${mk}</div>
-          <div class="text-muted" style="font-size:11px">${count} tugas</div>
-        </div>
-        <span class="badge" style="background:var(--blue-pale);color:var(--blue)">Aktif</span>
+      return `<div class="matkul-row">
+        <div class="mk-dot" style="background:${color}"></div>
+        <div class="mk-info"><div class="mk-name">${mk}</div><div class="mk-meta">${count} tugas</div></div>
+        <span class="mk-chip">Aktif</span>
       </div>`;
     }).join('');
   }
@@ -794,39 +804,42 @@
   function renderMatkulGrid() {
     const grid = document.getElementById('matkul-grid');
     if (!myMatkul.length) {
-      grid.innerHTML = '<div class="col-12 text-center text-muted py-5 small">Belum ada mata kuliah. Hubungi admin.</div>';
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--gray-500);font-size:13px">Belum ada mata kuliah. Hubungi admin untuk menetapkan mata kuliah Anda.</div>';
       return;
     }
     grid.innerHTML = myMatkul.map((mk, i) => {
       const color    = CARD_COLORS[i % CARD_COLORS.length];
       const tugasCount = allTugas.filter(t => t.matkul === mk).length;
-      return `<div class="col-md-6 col-lg-4">
-        <div class="card matkul-card border-0 shadow-sm">
-          <div style="height:6px;background:${color}"></div>
-          <div class="card-body">
-            <div class="text-muted text-uppercase fw-bold mb-1" style="font-size:11px;letter-spacing:.5px">${currentUser.jurusan||''}</div>
-            <div class="fw-bold mb-3" style="font-size:15px;color:var(--navy)">${mk}</div>
-            <div class="row g-2 mb-3 text-center">
-              <div class="col-4"><div class="bg-light rounded-2 py-2"><div class="fw-bold" style="font-size:16px;color:var(--navy)">${tugasCount}</div><div class="text-muted" style="font-size:10px">Tugas</div></div></div>
-              <div class="col-4"><div class="bg-light rounded-2 py-2"><div class="fw-bold" style="font-size:16px;color:var(--navy)">${allMhsList.filter(m=>m.jurusan===currentUser.jurusan).length}</div><div class="text-muted" style="font-size:10px">Mahasiswa</div></div></div>
-              <div class="col-4"><div class="bg-light rounded-2 py-2"><div class="fw-bold" style="font-size:16px;color:var(--navy)">16</div><div class="text-muted" style="font-size:10px">Pertemuan</div></div></div>
-            </div>
-            <div class="d-flex gap-2">
-              <button class="btn btn-primary btn-sm flex-grow-1" onclick="openModal()">+ Tugas</button>
-              <button class="btn btn-light btn-sm" onclick="switchAbsensiByMatkul('${mk}');showPage('absensi')">Absensi</button>
-              <button class="btn btn-light btn-sm" onclick="switchDiskusiByMatkul('${mk}');showPage('diskusi')">Diskusi</button>
-            </div>
+      const mkObj    = { nama: mk }; // placeholder — bisa diperkaya dari matkul.json
+      return `<div class="matkul-card">
+        <div class="mk-cover" style="background:${color}"></div>
+        <div class="mk-body">
+          <div class="mk-kode" style="font-size:11px;text-transform:uppercase;color:var(--gray-500);font-weight:700;margin-bottom:4px">${currentUser.jurusan||''}</div>
+          <div class="mk-title">${mk}</div>
+          <div class="mk-stats">
+            <div class="mks"><div class="mks-num">${tugasCount}</div><div class="mks-label">Tugas</div></div>
+            <div class="mks"><div class="mks-num">${allMhsList.filter(m=>m.jurusan===currentUser.jurusan).length}</div><div class="mks-label">Mahasiswa</div></div>
+            <div class="mks"><div class="mks-num">16</div><div class="mks-label">Pertemuan</div></div>
+          </div>
+          <div class="mk-actions">
+            <button class="btn-sm btn-primary" onclick="openModal()">+ Tugas</button>
+            <button class="btn-sm btn-outline" onclick="switchAbsensiByMatkul('${mk}');showPage('absensi')">Absensi</button>
+            <button class="btn-sm btn-outline" onclick="switchDiskusiByMatkul('${mk}');showPage('diskusi')">Diskusi</button>
           </div>
         </div>
       </div>`;
     }).join('');
   }
 
-  // ─── MAHASISWA ────────────────────────────────────────────────────────────
+  // ─── MAHASISWA (untuk absensi) ────────────────────────────────────────────
 
   async function loadMahasiswaJurusan() {
     try {
-      const res  = await fetch('/api/auth/list-mahasiswa', { method:'POST', headers: authHeaders(), body: JSON.stringify({}) });
+      const res  = await fetch('/api/auth/list-mahasiswa', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({})
+      });
       if (!res.ok) { allMhsList = []; renderBerandaMatkul(); renderMatkulGrid(); return; }
       const data = await res.json();
       allMhsList = (data.mahasiswa || []).filter(m => m.jurusan === currentUser.jurusan);
@@ -837,17 +850,23 @@
 
   // ─── ABSENSI ──────────────────────────────────────────────────────────────
 
+  let activeAbsensiMatkul = null;
+  let pertemuanData = [];   // cache pertemuan yang sedang ditampilkan
+  let verifPertemuanId = null;  // pertemuan yang sedang diverifikasi
+  let allMhsJurusan = [];   // cache mahasiswa jurusan dari allMhsList
+
   function renderAbsensiTabs() {
-    const sel = document.getElementById('absensi-tabs');
+    const tabs = document.getElementById('absensi-tabs');
     if (!myMatkul.length) {
-      sel.innerHTML = '<option value="">Tidak ada mata kuliah.</option>';
+      tabs.innerHTML = '<div style="color:var(--gray-500);font-size:13px;padding:8px">Tidak ada mata kuliah.</div>';
       return;
     }
-    sel.innerHTML = myMatkul.map((mk, i) =>
-      `<option value="${mk}">${mk}</option>`
+    tabs.innerHTML = myMatkul.map((mk, i) =>
+      `<button class="tab-btn${i===0?' active':''}" onclick="switchAbsensiByMatkul('${mk}',this)">${mk}</button>`
     ).join('');
+    // populate dropdown di modal
     populatePtmMatkulDropdown();
-    if (myMatkul.length) { sel.value = myMatkul[0]; switchAbsensiByMatkul(myMatkul[0]); }
+    if (myMatkul.length) switchAbsensiByMatkul(myMatkul[0]);
   }
 
   function populatePtmMatkulDropdown() {
@@ -857,60 +876,66 @@
       myMatkul.map(mk => `<option value="${mk}">${mk}</option>`).join('');
   }
 
-  function switchAbsensiByMatkul(mk) {
-    if (!mk) return;
+  function switchAbsensiByMatkul(mk, btn) {
     activeAbsensiMatkul = mk;
-    document.getElementById('absensi-tabs').value = mk;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    else document.querySelectorAll('.tab-btn').forEach(b => { if(b.textContent.trim()===mk) b.classList.add('active'); });
     loadPertemuan(mk);
   }
 
   async function loadPertemuan(matkul) {
     const container = document.getElementById('absensi-content');
-    container.innerHTML = '<div class="text-center text-muted py-5 small">⏳ Memuat data pertemuan...</div>';
+    container.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-500);font-size:13px">⏳ Memuat data pertemuan...</div>';
     try {
-      const res = await fetch(`/api/absensi/list-pertemuan?matkul=${encodeURIComponent(matkul)}`, { method:'GET', headers: authHeaders() });
+      const res = await fetch(`/api/absensi/list-pertemuan?matkul=${encodeURIComponent(matkul)}`, {
+        method: 'GET', headers: authHeaders()
+      });
       const data = await res.json();
       pertemuanData = data.pertemuan || [];
       allMhsJurusan = allMhsList.filter(m => m.jurusan === currentUser.jurusan);
       renderPertemuanList(pertemuanData, matkul);
     } catch(e) {
-      container.innerHTML = '<div class="text-center text-danger py-5 small">Gagal memuat data pertemuan.</div>';
+      container.innerHTML = '<div style="text-align:center;padding:32px;color:var(--red);font-size:13px">Gagal memuat data pertemuan.</div>';
     }
   }
 
   function renderPertemuanList(list, matkul) {
     const container = document.getElementById('absensi-content');
     if (!list.length) {
-      container.innerHTML = `<div class="text-center text-muted py-5 small">Belum ada pertemuan untuk <strong>${matkul}</strong>. Klik <strong>+ Buat Pertemuan</strong> untuk memulai.</div>`;
+      container.innerHTML = `<div style="text-align:center;padding:40px;color:var(--gray-500);font-size:13px">
+        Belum ada pertemuan untuk <strong>${matkul}</strong>. Klik <strong>+ Buat Pertemuan</strong> untuk memulai.
+      </div>`;
       return;
     }
+    // Sort: terbaru di atas
     const sorted = [...list].sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
-    container.innerHTML = '<div class="d-flex flex-column gap-3">' + sorted.map(ptm => {
+    container.innerHTML = '<div class="pertemuan-list">' + sorted.map((ptm, i) => {
       const tgl = new Date(ptm.tanggal).toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
-      const totalHadir    = ptm.kehadiran.filter(k => k.status === 'hadir').length;
-      const totalMenunggu = ptm.kehadiran.filter(k => k.status === 'menunggu').length;
-      const totalMhs      = allMhsJurusan.length;
+      const totalHadir   = ptm.kehadiran.filter(k => k.status === 'hadir').length;
+      const totalMenunggu= ptm.kehadiran.filter(k => k.status === 'menunggu').length;
+      const totalMhs     = allMhsJurusan.length;
       const badge = ptm.status === 'aktif'
-        ? '<span class="badge bg-success-subtle text-success">🟢 Aktif</span>'
-        : '<span class="badge bg-secondary-subtle text-secondary">🔒 Ditutup</span>';
-      return `<div class="card border-0 shadow-sm">
-        <div class="card-header bg-white d-flex align-items-center justify-content-between pertemuan-header py-3 border-0" onclick="togglePtmCard('ptm-body-${ptm.id}')">
+        ? '<span class="ptm-badge aktif">🟢 Aktif</span>'
+        : '<span class="ptm-badge ditutup">🔒 Ditutup</span>';
+      return `<div class="pertemuan-card">
+        <div class="pertemuan-card-header" onclick="togglePtmCard('ptm-body-${ptm.id}')">
           <div>
-            <div class="fw-bold mb-1" style="font-size:14px;color:var(--navy)">${ptm.judul}</div>
-            <div class="text-muted" style="font-size:12px">📅 ${tgl}${ptm.keterangan ? ' · '+ptm.keterangan : ''}</div>
+            <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:4px">${ptm.judul}</div>
+            <div style="font-size:12px;color:var(--gray-500)">📅 ${tgl}${ptm.keterangan ? ' · ' + ptm.keterangan : ''}</div>
           </div>
-          <div class="d-flex align-items-center gap-2 flex-shrink-0">
+          <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
             ${badge}
-            <span class="text-muted" style="font-size:12px">${totalHadir}/${totalMhs} hadir${totalMenunggu > 0 ? ` · <span class="fw-bold text-warning">${totalMenunggu} menunggu</span>` : ''}</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+            <span style="font-size:12px;color:var(--gray-500)">${totalHadir}/${totalMhs} hadir${totalMenunggu > 0 ? ` · <span style="color:var(--gold);font-weight:700">${totalMenunggu} menunggu</span>` : ''}</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--gray-400)"><path d="M6 9l6 6 6-6"/></svg>
           </div>
         </div>
-        <div class="card-body border-top pt-3" id="ptm-body-${ptm.id}" style="display:none">
+        <div class="pertemuan-card-body" id="ptm-body-${ptm.id}" style="display:none">
           ${renderKehadiranTable(ptm)}
-          <div class="d-flex gap-2 flex-wrap mt-3">
-            <button onclick="openModalVerifikasi('${ptm.id}')" class="btn btn-primary btn-sm">✅ Verifikasi Kehadiran</button>
-            ${ptm.status==='aktif' ? `<button onclick="konfirmasiTutupPertemuan('${ptm.id}')" class="btn btn-secondary btn-sm">🔒 Tutup Pertemuan</button>` : ''}
-            <button onclick="konfirmasiHapusPertemuan('${ptm.id}','${ptm.judul.replace(/'/g,'')}')" class="btn btn-sm" style="background:#FEF2F2;color:#DC2626">🗑 Hapus</button>
+          <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+            <button onclick="openModalVerifikasi('${ptm.id}')" style="padding:7px 14px;background:var(--blue);color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">✅ Verifikasi Kehadiran</button>
+            ${ptm.status==='aktif' ? `<button onclick="konfirmasiTutupPertemuan('${ptm.id}')" style="padding:7px 14px;background:var(--gray-200);color:var(--gray-700);border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">🔒 Tutup Pertemuan</button>` : ''}
+            <button onclick="konfirmasiHapusPertemuan('${ptm.id}','${ptm.judul.replace(/'/g,'')}')" style="padding:7px 14px;background:var(--red-pale);color:var(--red);border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">🗑 Hapus</button>
           </div>
         </div>
       </div>`;
@@ -919,26 +944,21 @@
 
   function renderKehadiranTable(ptm) {
     const mhsJurusan = allMhsJurusan;
-    if (!mhsJurusan.length) return '<div class="text-muted small">Belum ada mahasiswa di jurusan ini.</div>';
+    if (!mhsJurusan.length) return '<div style="font-size:13px;color:var(--gray-500)">Belum ada mahasiswa di jurusan ini.</div>';
     const rows = mhsJurusan.map((m, i) => {
       const k = ptm.kehadiran.find(x => x.mhs_id === m.id || x.nim === m.nim_nip);
       const statusHtml = k
-        ? `<span class="status-pill status-${k.status}">${k.status==='menunggu'?'⏳ Menunggu':k.status==='hadir'?'✅ Hadir':k.status==='izin'?'📋 Izin':k.status==='sakit'?'🤒 Sakit':'❌ Tidak Hadir'}</span>`
-        : '<span class="text-muted" style="font-size:12px">—</span>';
-      const alasanTag = k?.alasan_tipe
-        ? `<span class="badge ms-1" style="background:var(--blue-pale);color:var(--blue);font-size:10px">${k.alasan_tipe}</span>` : '';
+        ? `<span class="status-pill ${k.status}">${k.status === 'menunggu' ? '⏳ Menunggu' : k.status === 'hadir' ? '✅ Hadir' : k.status === 'izin' ? '📋 Izin' : '❌ Tidak Hadir'}</span>`
+        : '<span style="font-size:12px;color:var(--gray-400)">—</span>';
       return `<tr>
-        <td class="small">${i+1}</td>
-        <td class="small font-monospace" style="font-size:11px">${m.nim_nip}</td>
-        <td class="small">${m.nama}</td>
-        <td>${statusHtml}${alasanTag}</td>
-        <td class="small text-muted">${k?.keterangan||'—'}</td>
+        <td style="padding:8px 12px;font-size:12px">${i+1}</td>
+        <td style="padding:8px 12px;font-family:monospace;font-size:11px">${m.nim_nip}</td>
+        <td style="padding:8px 12px;font-size:12px">${m.nama}</td>
+        <td style="padding:8px 12px">${statusHtml}</td>
+        <td style="padding:8px 12px;font-size:12px;color:var(--gray-500)">${k?.keterangan||'—'}</td>
       </tr>`;
     }).join('');
-    return `<div class="table-responsive"><table class="table table-sm table-hover small mb-0">
-      <thead class="table-light"><tr><th>#</th><th>NIM</th><th>Nama</th><th>Status</th><th>Keterangan</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table></div>`;
+    return `<div class="absensi-table-wrap"><table class="abs-table"><thead><tr><th>#</th><th>NIM</th><th>Nama</th><th>Status</th><th>Keterangan</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }
 
   function togglePtmCard(bodyId) {
@@ -946,17 +966,21 @@
     if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
   }
 
+  // ── Modal Buat Pertemuan ──
+
   function openModalPertemuan() {
-    document.getElementById('ptm-alert').classList.add('d-none');
+    document.getElementById('modal-pertemuan').style.display = 'flex';
+    document.getElementById('ptm-alert').style.display = 'none';
     document.getElementById('ptm-judul').value = '';
     document.getElementById('ptm-tanggal').value = new Date().toISOString().slice(0,16);
     document.getElementById('ptm-keterangan').value = '';
     populatePtmMatkulDropdown();
     if (activeAbsensiMatkul) document.getElementById('ptm-matkul').value = activeAbsensiMatkul;
-    bsModalPertemuan.show();
   }
 
-  function closeModalPertemuan() { bsModalPertemuan.hide(); }
+  function closeModalPertemuan() {
+    document.getElementById('modal-pertemuan').style.display = 'none';
+  }
 
   async function submitBuatPertemuan() {
     const matkul     = document.getElementById('ptm-matkul').value;
@@ -964,16 +988,16 @@
     const tanggal    = document.getElementById('ptm-tanggal').value;
     const keterangan = document.getElementById('ptm-keterangan').value.trim();
     const alertEl    = document.getElementById('ptm-alert');
-    alertEl.classList.add('d-none');
+    alertEl.style.display = 'none';
     if (!matkul || !judul || !tanggal) {
       alertEl.textContent = 'Mata kuliah, judul, dan tanggal wajib diisi.';
-      alertEl.classList.remove('d-none'); return;
+      alertEl.style.display = 'block'; return;
     }
     const btn = document.getElementById('ptm-submit-btn');
     btn.disabled = true; btn.textContent = 'Menyimpan...';
     try {
       const res = await fetch('/api/absensi/buat-pertemuan', {
-        method:'POST', headers: authHeaders(),
+        method: 'POST', headers: authHeaders(),
         body: JSON.stringify({ matkul, judul, tanggal, keterangan })
       });
       const data = await res.json();
@@ -982,9 +1006,11 @@
       showToast(`Pertemuan "${judul}" berhasil dibuat!`);
       switchAbsensiByMatkul(matkul);
     } catch(e) {
-      alertEl.textContent = e.message; alertEl.classList.remove('d-none');
+      alertEl.textContent = e.message; alertEl.style.display = 'block';
     } finally { btn.disabled = false; btn.textContent = 'Buat Pertemuan'; }
   }
+
+  // ── Modal Verifikasi ──
 
   function openModalVerifikasi(pertemuanId) {
     verifPertemuanId = pertemuanId;
@@ -992,58 +1018,57 @@
     if (!ptm) return;
     document.getElementById('verif-modal-title').textContent = `Verifikasi: ${ptm.judul}`;
     document.getElementById('btn-tutup-ptm').style.display = ptm.status === 'aktif' ? 'inline-block' : 'none';
-    document.getElementById('verif-alert').classList.add('d-none');
+    document.getElementById('verif-alert').style.display = 'none';
     renderVerifList(ptm);
-    bsModalVerifikasi.show();
+    document.getElementById('modal-verifikasi').style.display = 'flex';
   }
 
-  function closeModalVerifikasi() { bsModalVerifikasi.hide(); verifPertemuanId = null; }
+  function closeModalVerifikasi() {
+    document.getElementById('modal-verifikasi').style.display = 'none';
+    verifPertemuanId = null;
+  }
 
   function renderVerifList(ptm) {
     const mhsJurusan = allMhsJurusan;
     if (!mhsJurusan.length) {
-      document.getElementById('verif-list').innerHTML = '<div class="text-center text-muted py-4 small">Belum ada mahasiswa di jurusan ini.</div>';
+      document.getElementById('verif-list').innerHTML = '<div style="font-size:13px;color:var(--gray-500);text-align:center;padding:24px">Belum ada mahasiswa di jurusan ini.</div>';
       return;
     }
-    const alasanLabel = { hadir:'✅ Hadir', izin:'📋 Izin', sakit:'🤒 Sakit' };
     const rows = mhsJurusan.map((m, i) => {
       const k = ptm.kehadiran.find(x => x.mhs_id === m.id || x.nim === m.nim_nip);
       const curStatus = k?.status || '';
-      const options = ['hadir','izin','sakit','tidak_hadir'].map(s =>
-        `<option value="${s}" ${curStatus===s?'selected':''}>${s==='hadir'?'✅ Hadir':s==='izin'?'📋 Izin':s==='sakit'?'🤒 Sakit':'❌ Tidak Hadir'}</option>`
+      const options = ['hadir','izin','tidak_hadir'].map(s =>
+        `<option value="${s}" ${curStatus===s?'selected':''}>${s==='hadir'?'✅ Hadir':s==='izin'?'📋 Izin':'❌ Tidak Hadir'}</option>`
       ).join('');
-      const alasanTag = k?.alasan_tipe
-        ? `<span class="badge ms-1" style="background:var(--blue-pale);color:var(--blue);font-size:10px">${alasanLabel[k.alasan_tipe]||k.alasan_tipe}</span>` : '';
-      const menungguBadge = curStatus === 'menunggu' ? ` <span class="text-warning fw-bold" style="font-size:10px">⏳</span>` : '';
+      const menungguBadge = curStatus === 'menunggu' ? ' <span style="font-size:10px;color:var(--gold);font-weight:700">⏳ mengajukan</span>' : '';
       return `<tr>
-        <td class="small">${i+1}</td>
-        <td class="font-monospace" style="font-size:11px">${m.nim_nip}</td>
-        <td class="small">${m.nama}${alasanTag}${menungguBadge}</td>
-        <td>
-          <select onchange="updateVerifStatus('${ptm.id}','${m.id}','${m.nim_nip}','${m.nama.replace(/'/g,'')}',this.value)" class="form-select form-select-sm" style="width:auto;font-size:12px">
-            <option value="">-- pilih --</option>${options}
+        <td style="padding:8px 12px;font-size:12px">${i+1}</td>
+        <td style="padding:8px 12px;font-family:monospace;font-size:11px">${m.nim_nip}</td>
+        <td style="padding:8px 12px;font-size:12px">${m.nama}${menungguBadge}</td>
+        <td style="padding:8px 12px">
+          <select onchange="updateVerifStatus('${ptm.id}','${m.id}','${m.nim_nip}','${m.nama.replace(/'/g,'')}',this.value)" style="padding:5px 8px;border:1.5px solid var(--gray-200);border-radius:6px;font-size:12px;font-family:Inter,sans-serif;cursor:pointer">
+            <option value="">-- pilih --</option>
+            ${options}
           </select>
         </td>
-        <td class="small text-muted">${k?.keterangan||''}</td>
+        <td style="padding:8px 12px;font-size:11px;color:var(--gray-500)">${k?.keterangan||''}</td>
       </tr>`;
     }).join('');
     document.getElementById('verif-list').innerHTML =
-      `<div class="table-responsive"><table class="table table-sm table-hover small mb-0">
-        <thead class="table-light"><tr><th>#</th><th>NIM</th><th>Nama</th><th>Verifikasi</th><th>Ket. Mahasiswa</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table></div>`;
+      `<table class="abs-table" style="font-size:13px;width:100%"><thead><tr><th>#</th><th>NIM</th><th>Nama</th><th>Status</th><th>Ket. Mahasiswa</th></tr></thead><tbody>${rows}</tbody></table>`;
   }
 
   async function updateVerifStatus(pertemuanId, mhsId, nim, nama, status) {
     if (!status) return;
     try {
       const res = await fetch('/api/absensi/verifikasi', {
-        method:'POST', headers: authHeaders(),
+        method: 'POST', headers: authHeaders(),
         body: JSON.stringify({ pertemuan_id: pertemuanId, mhs_id: mhsId, nim, nama, status })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       showToast(`Status ${nama}: ${status}`);
+      // Update cache lokal
       const ptmIdx = pertemuanData.findIndex(p => p.id === pertemuanId);
       if (ptmIdx !== -1) {
         const kidx = pertemuanData[ptmIdx].kehadiran.findIndex(k => k.mhs_id === mhsId || k.nim === nim);
@@ -1052,7 +1077,7 @@
       }
     } catch(e) {
       const alertEl = document.getElementById('verif-alert');
-      alertEl.textContent = e.message; alertEl.classList.remove('d-none');
+      alertEl.textContent = e.message; alertEl.style.display = 'block';
     }
   }
 
@@ -1061,7 +1086,7 @@
     if (!confirm('Tutup pertemuan ini? Mahasiswa tidak bisa submit absen lagi.')) return;
     try {
       const res = await fetch('/api/absensi/verifikasi', {
-        method:'POST', headers: authHeaders(),
+        method: 'POST', headers: authHeaders(),
         body: JSON.stringify({ pertemuan_id: verifPertemuanId, tutup: true })
       });
       const data = await res.json();
@@ -1072,13 +1097,17 @@
     } catch(e) { showToast('Gagal menutup pertemuan.'); }
   }
 
-  function konfirmasiTutupPertemuan(pertemuanId) { verifPertemuanId = pertemuanId; tutupPertemuan(); }
+  function konfirmasiTutupPertemuan(pertemuanId) {
+    verifPertemuanId = pertemuanId;
+    tutupPertemuan();
+  }
 
   async function konfirmasiHapusPertemuan(id, judul) {
     if (!confirm(`Hapus pertemuan "${judul}"? Semua data kehadiran akan ikut terhapus.`)) return;
     try {
       const res = await fetch('/api/absensi/hapus-pertemuan', {
-        method:'POST', headers: authHeaders(), body: JSON.stringify({ id })
+        method: 'POST', headers: authHeaders(),
+        body: JSON.stringify({ id })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -1095,13 +1124,13 @@
   function renderDiskusiRooms() {
     const list = document.getElementById('diskusi-room-list');
     if (!myMatkul.length) {
-      list.innerHTML = '<div class="p-3 text-muted small">Tidak ada mata kuliah.</div>';
+      list.innerHTML = '<div style="padding:16px;font-size:13px;color:var(--gray-500)">Tidak ada mata kuliah.</div>';
       return;
     }
     list.innerHTML = myMatkul.map((mk, i) => `
-      <div class="diskusi-room p-3${i===0?' active':''}" onclick="selectRoom(this,'${mk}')">
-        <div class="dr-name fw-bold" style="font-size:13px;color:var(--navy)">${mk}</div>
-        <div class="dr-last text-muted text-truncate" id="dr-last-${mk.replace(/\s+/g,'_')}" style="font-size:11px">Klik untuk membuka</div>
+      <div class="diskusi-room${i===0?' active':''}" onclick="selectRoom(this,'${mk}')">
+        <div class="dr-name">${mk}</div>
+        <div class="dr-last" id="dr-last-${mk.replace(/\s+/g,'_')}">Klik untuk membuka</div>
       </div>`).join('');
     if (myMatkul.length) selectRoom(list.querySelector('.diskusi-room'), myMatkul[0]);
   }
@@ -1118,8 +1147,8 @@
     activeDiscMatkul = nama;
     document.getElementById('chat-title').textContent = nama;
     document.getElementById('chat-sub').textContent   = currentUser.jurusan || '—';
-    document.getElementById('btn-refresh-chat').classList.remove('d-none');
-    document.getElementById('chat-input-area').style.setProperty('display','flex','important');
+    document.getElementById('btn-refresh-chat').style.display = 'inline-block';
+    document.getElementById('chat-input-area').style.display  = 'flex';
     if (diskusiPolling) clearInterval(diskusiPolling);
     loadChatMessages(nama);
     diskusiPolling = setInterval(() => loadChatMessages(nama), 15000);
@@ -1127,7 +1156,9 @@
 
   async function loadChatMessages(matkul) {
     try {
-      const res = await fetch(`/api/diskusi/pesan?matkul=${encodeURIComponent(matkul)}&limit=60`, { method:'GET', headers: authHeaders() });
+      const res = await fetch(`/api/diskusi/pesan?matkul=${encodeURIComponent(matkul)}&limit=60`, {
+        method: 'GET', headers: authHeaders()
+      });
       const data = await res.json();
       renderChatMessages(data.pesan || []);
       const safeKey = matkul.replace(/\s+/g,'_');
@@ -1137,7 +1168,7 @@
         el.textContent = last.sender_nama.split(' ')[0] + ': ' + last.isi.substring(0, 30) + (last.isi.length > 30 ? '…' : '');
       }
     } catch(e) {
-      document.getElementById('chat-messages').innerHTML = '<div class="text-center text-danger py-4 small">Gagal memuat pesan.</div>';
+      document.getElementById('chat-messages').innerHTML = '<div style="text-align:center;padding:24px;font-size:13px;color:var(--red)">Gagal memuat pesan.</div>';
     }
   }
 
@@ -1145,23 +1176,22 @@
     const c = document.getElementById('chat-messages');
     const wasAtBottom = c.scrollHeight - c.scrollTop <= c.clientHeight + 50;
     if (!messages.length) {
-      c.innerHTML = '<div class="text-center text-muted py-5 small">Belum ada pesan. Mulai diskusi!</div>';
+      c.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray-500);font-size:13px">Belum ada pesan. Mulai diskusi!</div>';
       return;
     }
     c.innerHTML = messages.map(m => {
       const isMe    = m.sender_id === currentUser.id;
       const inisial = (m.sender_nama || '?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
       const time    = new Date(m.created_at).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
-      const roleTag = m.role === 'dosen' ? ' <span class="badge" style="background:var(--blue-pale);color:var(--blue);font-size:10px">Dosen</span>' : '';
+      const roleTag = m.role === 'dosen' ? ' <span style="font-size:10px;background:var(--blue-pale);color:var(--blue);padding:1px 5px;border-radius:4px;font-weight:600">Dosen</span>' : '';
       const deleteBtn = (isMe || currentUser.role === 'dosen')
-        ? `<button onclick="hapusPesan('${m.id}')" class="btn btn-link btn-sm p-0 ms-1 text-muted" style="font-size:11px" title="Hapus">✕</button>` : '';
-      const avStyle = m.role==='dosen' ? 'background:var(--navy);color:white' : '';
-      return `<div class="d-flex gap-2 ${isMe?'flex-row-reverse msg-me':'msg-other'}">
-        <div class="avatar flex-shrink-0 align-self-end" style="width:32px;height:32px;border-radius:8px;font-size:12px;${avStyle}">${inisial}</div>
+        ? `<button onclick="hapusPesan('${m.id}')" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:11px;padding:0 4px" title="Hapus">✕</button>` : '';
+      return `<div class="chat-msg ${isMe?'me':'other'}">
+        <div class="msg-av" style="${m.role==='dosen'?'background:var(--navy);color:white':''}">${inisial}</div>
         <div>
-          <div class="text-muted mb-1" style="font-size:11px">${isMe?'Anda':m.sender_nama}${roleTag}${deleteBtn}</div>
+          <div style="font-size:11px;color:var(--gray-500);margin-bottom:3px">${isMe?'Anda':m.sender_nama}${roleTag} ${deleteBtn}</div>
           <div class="msg-bubble">${m.isi.replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>
-          <div class="text-muted mt-1 ${isMe?'text-end':''}" style="font-size:10px">${time}</div>
+          <div class="msg-time">${time}</div>
         </div>
       </div>`;
     }).join('');
@@ -1169,6 +1199,7 @@
   }
 
   function refreshChat() { if (activeDiscMatkul) loadChatMessages(activeDiscMatkul); }
+
   function handleChatKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();} }
 
   async function sendMessage() {
@@ -1178,7 +1209,7 @@
     input.value = '';
     try {
       const res = await fetch('/api/diskusi/kirim', {
-        method:'POST', headers: authHeaders(),
+        method: 'POST', headers: authHeaders(),
         body: JSON.stringify({ matkul: activeDiscMatkul, isi: text, nama: currentUser.nama })
       });
       const data = await res.json();
@@ -1191,7 +1222,7 @@
     if (!activeDiscMatkul) return;
     try {
       const res = await fetch('/api/diskusi/hapus', {
-        method:'POST', headers: authHeaders(),
+        method: 'POST', headers: authHeaders(),
         body: JSON.stringify({ matkul: activeDiscMatkul, pesan_id: pesanId })
       });
       if (res.ok) loadChatMessages(activeDiscMatkul);
@@ -1210,24 +1241,13 @@
     closeSidebar(); window.scrollTo(0,0);
   }
 
-  function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('overlay').classList.toggle('open');
-  }
-  function closeSidebar() {
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('overlay').classList.remove('open');
-  }
+  function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
+  function closeSidebar()  { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('open'); }
 
   function showToast(msg) {
-    const existing = document.querySelector('#toast .toast');
-    if (existing) existing.remove();
-    const el = document.createElement('div');
-    el.className = 'toast show align-items-center text-white border-0';
-    el.style.cssText = 'background:#0F172A';
-    el.innerHTML = `<div class="d-flex"><div class="toast-body">${msg}</div></div>`;
-    document.getElementById('toast').appendChild(el);
-    setTimeout(() => el.remove(), 2500);
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
   }
 
   async function gantiPassword() {
@@ -1235,15 +1255,14 @@
     const newPass = document.getElementById('new-pass').value;
     const alertEl = document.getElementById('pass-alert');
     const succEl  = document.getElementById('pass-success');
-    alertEl.classList.add('d-none'); succEl.classList.add('d-none');
-    if (!oldPass||!newPass) { alertEl.textContent='Isi kedua kolom.'; alertEl.classList.remove('d-none'); return; }
+    alertEl.style.display = succEl.style.display = 'none';
+    if (!oldPass||!newPass) { alertEl.textContent='Isi kedua kolom.'; alertEl.style.display='block'; return; }
     try {
       await Auth.changePassword(oldPass, newPass);
-      succEl.textContent='Password berhasil diubah.'; succEl.classList.remove('d-none');
+      succEl.textContent='Password berhasil diubah.'; succEl.style.display='block';
       document.getElementById('old-pass').value = document.getElementById('new-pass').value = '';
-    } catch(e) { alertEl.textContent=e.message; alertEl.classList.remove('d-none'); }
+    } catch(e) { alertEl.textContent=e.message; alertEl.style.display='block'; }
   }
 </script>
 </body>
 </html>
-
