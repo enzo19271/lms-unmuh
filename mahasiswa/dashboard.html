@@ -112,6 +112,36 @@
     .pill-gray   { background:#F1F5F9; color:#64748B; }
     .pill-blue   { background:var(--blue-pale);   color:var(--blue); }
 
+    /* ── TUGAS KUMPUL STATUS ── */
+    .kumpul-status { display:flex; align-items:center; gap:6px; font-size:11px; font-weight:700; margin-top:5px; }
+    .kumpul-status.sudah { color:#16A34A; }
+    .kumpul-status.belum { color:#D97706; }
+    .kumpul-status svg  { width:13px; height:13px; flex-shrink:0; }
+    .btn-kumpul { padding:6px 14px; border-radius:8px; border:none; font-size:12px; font-weight:700; cursor:pointer; transition:all .15s; white-space:nowrap; font-family:'Inter',sans-serif; }
+    .btn-kumpul.primary { background:var(--blue); color:#fff; }
+    .btn-kumpul.primary:hover { background:#1D4ED8; }
+    .btn-kumpul.secondary { background:#F1F5F9; color:var(--navy); border:1.5px solid #E2E8F0; }
+    .btn-kumpul.secondary:hover { background:#E2E8F0; }
+
+    /* ── MODAL KUMPUL ── */
+    .modal-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:2000; align-items:center; justify-content:center; padding:16px; }
+    .modal-backdrop.open { display:flex; }
+    .modal-box { background:#fff; border-radius:18px; width:100%; max-width:500px; box-shadow:0 20px 60px rgba(0,0,0,.2); overflow:hidden; }
+    .modal-header { padding:20px 24px 16px; border-bottom:1px solid #F1F5F9; display:flex; align-items:flex-start; gap:12px; }
+    .modal-header-icon { width:42px; height:42px; border-radius:10px; background:var(--blue-pale); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .modal-header-icon svg { width:22px; height:22px; color:var(--blue); }
+    .modal-title { font-size:15px; font-weight:800; color:var(--navy); line-height:1.3; }
+    .modal-sub   { font-size:12px; color:#64748B; margin-top:2px; }
+    .modal-body  { padding:20px 24px; }
+    .modal-label { font-size:12px; font-weight:700; color:var(--navy); margin-bottom:5px; }
+    .modal-input { width:100%; padding:10px 13px; border:1.5px solid #E2E8F0; border-radius:9px; font-size:13px; font-family:'Inter',sans-serif; color:var(--navy); outline:none; box-sizing:border-box; transition:border-color .15s; }
+    .modal-input:focus { border-color:var(--blue); }
+    textarea.modal-input { resize:vertical; min-height:80px; }
+    .modal-alert { font-size:12px; color:var(--red); background:var(--red-pale); border-radius:8px; padding:9px 13px; margin-bottom:12px; display:none; }
+    .modal-footer { padding:16px 24px 20px; display:flex; gap:10px; justify-content:flex-end; border-top:1px solid #F1F5F9; }
+    .modal-info-row { background:#F8FAFC; border-radius:10px; padding:10px 14px; margin-bottom:14px; font-size:12px; color:#475569; }
+    .modal-info-row strong { color:var(--navy); }
+
     /* ── ABSENSI DROPDOWN PICKER ── */
     .abs-picker-wrap { max-width:520px; }
     .abs-picker-label { font-size:11px; font-weight:700; color:#64748B; text-transform:uppercase; letter-spacing:.6px; display:block; margin-bottom:8px; }
@@ -226,6 +256,39 @@
 
 <!-- Sidebar overlay -->
 <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- ═══ MODAL KUMPUL / EDIT TUGAS ═══ -->
+<div class="modal-backdrop" id="modal-kumpul" onclick="closeKumpulModal(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-header-icon">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+      </div>
+      <div>
+        <div class="modal-title" id="modal-kumpul-title">Kumpulkan Tugas</div>
+        <div class="modal-sub" id="modal-kumpul-sub">Isi form di bawah untuk mengumpulkan tugas.</div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-info-row" id="modal-kumpul-info"></div>
+      <div class="modal-alert" id="modal-kumpul-alert"></div>
+      <div class="mb-3">
+        <div class="modal-label">Link File / Google Drive <span style="color:#64748B;font-weight:400">(opsional jika ada catatan)</span></div>
+        <input type="url" class="modal-input" id="kumpul-link" placeholder="https://drive.google.com/..." />
+      </div>
+      <div class="mb-3">
+        <div class="modal-label">Catatan Pengumpulan <span style="color:#64748B;font-weight:400">(opsional jika ada link)</span></div>
+        <textarea class="modal-input" id="kumpul-catatan" placeholder="Tulis catatan atau keterangan pengumpulan..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-kumpul secondary" onclick="closeKumpulModal()">Batal</button>
+      <button class="btn-kumpul primary" id="btn-submit-kumpul" onclick="submitKumpulTugas()">
+        <span id="btn-kumpul-text">Kumpulkan</span>
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- ══ SIDEBAR ══ -->
 <aside class="sidebar" id="sidebar">
@@ -662,7 +725,7 @@
   // ═══════════════════════════════════════════════════════
   async function loadTugas() {
     try {
-      const res = await fetch('/api/tugas/list');
+      const res = await fetch('/api/tugas/list', { headers: authHeaders() });
       if (!res.ok) throw new Error('Gagal memuat tugas.');
       const json = await res.json();
       allTugas = json.tugas || [];
@@ -694,6 +757,24 @@
       const dl = deadlineLabel(t.deadline);
       const sp = statusPill(t.status);
       const iconCls = t.status === 'aktif' ? 'sc-yellow' : (t.status === 'ditutup' ? '' : 'sc-green');
+      const sudahKumpul = !!t.pengumpulan_saya;
+
+      // Status pengumpulan badge
+      const kumpulBadge = sudahKumpul
+        ? `<div class="kumpul-status sudah"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Sudah dikumpulkan</div>`
+        : (t.status === 'aktif' ? `<div class="kumpul-status belum"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg> Belum dikumpulkan</div>` : '');
+
+      // Tombol aksi
+      let btnKumpul = '';
+      if (t.status === 'aktif') {
+        const tugasJson = JSON.stringify(t).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        if (sudahKumpul) {
+          btnKumpul = `<button class="btn-kumpul secondary" onclick='openKumpulModal(${JSON.stringify(t)}, true)'>✏️ Edit</button>`;
+        } else {
+          btnKumpul = `<button class="btn-kumpul primary" onclick='openKumpulModal(${JSON.stringify(t)}, false)'>📤 Kumpulkan</button>`;
+        }
+      }
+
       return `<div class="tugas-card" data-status="${t.status}">
         <div class="tugas-card-icon ${iconCls}" style="${!iconCls?'background:#F1F5F9;color:#64748B':''}">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
@@ -701,10 +782,12 @@
         <div class="flex-fill">
           <div class="tc-name">${t.judul}</div>
           <div class="tc-meta">${t.matkul}${t.deskripsi ? ' · ' + t.deskripsi.substring(0,60) + (t.deskripsi.length>60?'…':'') : ''}</div>
+          ${kumpulBadge}
         </div>
-        <div class="text-end flex-shrink-0">
-          <div class="status-pill ${sp.cls}">${sp.label}</div>
+        <div class="text-end flex-shrink-0 d-flex flex-column align-items-end gap-2">
+          <div><span class="status-pill ${sp.cls}">${sp.label}</span></div>
           <div class="tc-deadline">Deadline: ${formatDate(t.deadline)}</div>
+          ${btnKumpul}
         </div>
       </div>`;
     }).join('');
@@ -1219,6 +1302,101 @@
       document.getElementById('old-pass').value = '';
       document.getElementById('new-pass').value = '';
     } catch(e) { alertEl.textContent = e.message; alertEl.style.display = 'block'; }
+  }
+  // ═══════════════════════════════════════════════════════
+  //  KUMPUL TUGAS — MODAL
+  // ═══════════════════════════════════════════════════════
+  let _kumpulTugas   = null;   // tugas yang sedang dibuka
+  let _kumpulIsEdit  = false;  // true = edit kiriman, false = submit baru
+
+  function openKumpulModal(tugas, isEdit) {
+    _kumpulTugas  = tugas;
+    _kumpulIsEdit = isEdit;
+
+    // Reset form
+    document.getElementById('kumpul-link').value    = '';
+    document.getElementById('kumpul-catatan').value = '';
+    document.getElementById('modal-kumpul-alert').style.display = 'none';
+
+    // Isi info tugas
+    const deadlineStr = tugas.deadline ? formatDate(tugas.deadline) : '—';
+    document.getElementById('modal-kumpul-info').innerHTML =
+      `<strong>${tugas.judul}</strong> &mdash; ${tugas.matkul}<br>
+       <span style="color:#64748B">Deadline: ${deadlineStr}</span>`;
+
+    if (isEdit && tugas.pengumpulan_saya) {
+      // Edit — isi nilai lama
+      document.getElementById('kumpul-link').value    = tugas.pengumpulan_saya.link    || '';
+      document.getElementById('kumpul-catatan').value = tugas.pengumpulan_saya.catatan || '';
+      document.getElementById('modal-kumpul-title').textContent = 'Edit Kiriman Tugas';
+      document.getElementById('modal-kumpul-sub').textContent   = 'Perbarui link atau catatan kiriman kamu.';
+      document.getElementById('btn-kumpul-text').textContent    = 'Simpan Perubahan';
+    } else {
+      document.getElementById('modal-kumpul-title').textContent = 'Kumpulkan Tugas';
+      document.getElementById('modal-kumpul-sub').textContent   = 'Isi form di bawah untuk mengumpulkan tugas.';
+      document.getElementById('btn-kumpul-text').textContent    = 'Kumpulkan';
+    }
+
+    document.getElementById('modal-kumpul').classList.add('open');
+  }
+
+  function closeKumpulModal(e) {
+    if (e && e.target !== document.getElementById('modal-kumpul')) return;
+    document.getElementById('modal-kumpul').classList.remove('open');
+  }
+
+  async function submitKumpulTugas() {
+    const link    = document.getElementById('kumpul-link').value.trim();
+    const catatan = document.getElementById('kumpul-catatan').value.trim();
+    const alertEl = document.getElementById('modal-kumpul-alert');
+    const btnEl   = document.getElementById('btn-submit-kumpul');
+    const btnText = document.getElementById('btn-kumpul-text');
+    alertEl.style.display = 'none';
+
+    if (!link && !catatan) {
+      alertEl.textContent     = 'Isi minimal link file atau catatan pengumpulan.';
+      alertEl.style.display   = 'block';
+      return;
+    }
+
+    btnEl.disabled   = true;
+    btnText.textContent = _kumpulIsEdit ? 'Menyimpan…' : 'Mengumpulkan…';
+
+    try {
+      const endpoint = _kumpulIsEdit ? '/api/tugas/edit-kumpulan' : '/api/tugas/kumpul';
+      const body     = {
+        tugas_id: _kumpulTugas.id,
+        link,
+        catatan,
+        nama: currentUser.nama,
+        nim:  currentUser.nim_nip,
+      };
+
+      const res = await fetch(endpoint, {
+        method:  'POST',
+        headers: authHeaders(),
+        body:    JSON.stringify(body),
+      });
+      const json = await res.json();
+
+      if (!res.ok) {
+        alertEl.textContent   = json.error || 'Terjadi kesalahan.';
+        alertEl.style.display = 'block';
+        return;
+      }
+
+      document.getElementById('modal-kumpul').classList.remove('open');
+      showToast(_kumpulIsEdit ? '✅ Kiriman berhasil diperbarui!' : '✅ Tugas berhasil dikumpulkan!');
+
+      // Refresh data tugas
+      await loadTugas();
+    } catch(e) {
+      alertEl.textContent   = 'Gagal terhubung ke server.';
+      alertEl.style.display = 'block';
+    } finally {
+      btnEl.disabled      = false;
+      btnText.textContent = _kumpulIsEdit ? 'Simpan Perubahan' : 'Kumpulkan';
+    }
   }
 </script>
 </body>
