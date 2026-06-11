@@ -25,13 +25,14 @@
     {
       "id": "kls_1781165979185",
       "matkul_id": "mk_1781006313065",
-      "nama_kelas": "KELAS C",
+      "nama_kelas": "C",
       "semester": 2,
       "prodi": "Pendidikan Jasmani Kesehatan dan Rekreasi",
       "dosen_id": "usr_1781089978920",
       "jadwal": "",
       "mahasiswa": [],
-      "created_at": "2026-06-11T08:19:39.185Z"
+      "created_at": "2026-06-11T08:19:39.185Z",
+      "updated_at": "2026-06-11T08:19:50.042Z"
     }
   ]
 }
