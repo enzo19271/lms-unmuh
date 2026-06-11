@@ -80,7 +80,16 @@
       "deadline": "2026-06-15T17:31",
       "dosen_id": "usr_1781166257496",
       "status": "aktif",
-      "pengumpulan": [],
+      "pengumpulan": [
+        {
+          "mhs_id": "usr_1781166073720",
+          "nim": "250241114",
+          "nama": "Enzo Fachrezie",
+          "link": "https://google.com",
+          "catatan": "Anjay Mabar",
+          "submitted_at": "2026-06-11T10:40:19.720Z"
+        }
+      ],
       "created_at": "2026-06-11T10:32:00.096Z"
     },
     {
