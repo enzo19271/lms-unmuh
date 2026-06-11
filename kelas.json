@@ -10,6 +10,17 @@
       "jadwal": "",
       "mahasiswa": [],
       "created_at": "2026-06-11T08:18:45.917Z"
+    },
+    {
+      "id": "kls_1781165945639",
+      "matkul_id": "mk_1781006313065",
+      "nama_kelas": "B",
+      "semester": 2,
+      "prodi": "Pendidikan Jasmani Kesehatan dan Rekreasi",
+      "dosen_id": "usr_1781089978920",
+      "jadwal": "",
+      "mahasiswa": [],
+      "created_at": "2026-06-11T08:19:05.639Z"
     }
   ]
 }
