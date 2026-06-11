@@ -82,6 +82,18 @@
       "status": "aktif",
       "pengumpulan": [],
       "created_at": "2026-06-11T10:32:00.096Z"
+    },
+    {
+      "id": "tgs_1781173964294",
+      "judul": "Tugas 1 - Buatkan Video Mini Vlog",
+      "deskripsi": "Video Vlog Lari 3KM maksimal durasi 3 Menit",
+      "kelas_id": "kls_1781165979185",
+      "matkul_id": "mk_1781006313065",
+      "deadline": "2026-06-16T17:32",
+      "dosen_id": "usr_1781166257496",
+      "status": "aktif",
+      "pengumpulan": [],
+      "created_at": "2026-06-11T10:32:44.294Z"
     }
   ]
 }
