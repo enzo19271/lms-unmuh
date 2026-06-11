@@ -42,6 +42,17 @@
       ],
       "created_at": "2026-06-11T08:19:39.185Z",
       "updated_at": "2026-06-11T10:27:59.638Z"
+    },
+    {
+      "id": "kls_1781173724919",
+      "matkul_id": "mk_1781045366536",
+      "nama_kelas": "A",
+      "semester": 2,
+      "prodi": "Pendidikan Jasmani Kesehatan dan Rekreasi",
+      "dosen_id": "usr_1781089978920",
+      "jadwal": "",
+      "mahasiswa": [],
+      "created_at": "2026-06-11T10:28:44.919Z"
     }
   ]
 }
