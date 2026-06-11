@@ -381,6 +381,18 @@
       "status": "aktif",
       "created_at": "2026-06-11T11:49:24.123Z",
       "kehadiran": []
+    },
+    {
+      "id": "abs_1781178572470",
+      "kelas_id": "kls_1781165925917",
+      "matkul_id": "mk_1781006313065",
+      "judul": "Pertemuan 6",
+      "tanggal": "2026-06-11T11:49",
+      "keterangan": "",
+      "dosen_id": "usr_1781166257496",
+      "status": "aktif",
+      "created_at": "2026-06-11T11:49:32.470Z",
+      "kehadiran": []
     }
   ]
 }
