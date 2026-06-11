@@ -273,6 +273,18 @@
           "verified_at": null
         }
       ]
+    },
+    {
+      "id": "abs_1781167239657",
+      "kelas_id": "kls_1781165945639",
+      "matkul_id": "mk_1781006313065",
+      "judul": "Pertemuan 1",
+      "tanggal": "2026-06-12T08:40",
+      "keterangan": "",
+      "dosen_id": "usr_1781166257496",
+      "status": "aktif",
+      "created_at": "2026-06-11T08:40:39.657Z",
+      "kehadiran": []
     }
   ]
 }
