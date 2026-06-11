@@ -70,6 +70,18 @@
       "dosen_id": "usr_1781069582657",
       "status": "aktif",
       "created_at": "2026-06-10T05:46:41.424Z"
+    },
+    {
+      "id": "tgs_1781173920096",
+      "judul": "Tugas 1 - Buatkan Analisis Pelari Kalcer Dealova",
+      "deskripsi": "Buatkan dalam kertas A4 Maksimal 3 Halaman",
+      "kelas_id": "kls_1781165925917",
+      "matkul_id": "mk_1781006313065",
+      "deadline": "2026-06-15T17:31",
+      "dosen_id": "usr_1781166257496",
+      "status": "aktif",
+      "pengumpulan": [],
+      "created_at": "2026-06-11T10:32:00.096Z"
     }
   ]
 }
