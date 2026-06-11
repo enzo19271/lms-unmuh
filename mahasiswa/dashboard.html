@@ -481,7 +481,7 @@
     <div class="abs-picker-wrap mb-4">
       <span class="abs-picker-label">Pilih Mata Kuliah</span>
       <div class="abs-select-outer">
-        <select class="abs-select" id="abs-matkul-select" onchange="switchAbsMatkul(this.value)">
+        <select class="abs-select" id="abs-matkul-select" onchange="switchAbsKelas(this.value)">
           <option value="">⏳ Memuat mata kuliah...</option>
         </select>
         <svg class="abs-select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -538,7 +538,7 @@
             <div class="fw-bold" style="font-size:14px;color:var(--navy);" id="chat-title">Pilih ruang diskusi</div>
             <div class="text-muted" style="font-size:11px;" id="chat-dosen">—</div>
           </div>
-          <button onclick="if(activeDiskusi)loadChatMessages(activeDiskusi)" class="btn btn-sm btn-light" style="font-size:12px;" title="Refresh">🔄</button>
+          <button onclick="if(activeDiskusi)loadChatMessages(activeDiskusi)"  class="btn btn-sm btn-light" style="font-size:12px;" title="Refresh">🔄</button>
         </div>
         <div class="chat-messages" id="chat-messages">
           <div class="chat-empty">
@@ -612,7 +612,7 @@
   //  STATE
   // ═══════════════════════════════════════════════════════
   let currentUser   = null;
-  let allMatkul     = [];
+  let allKelas      = [];  // kelas yang diikuti mahasiswa (dari /api/kelas/my-kelas)
   let allTugas      = [];
   let currentFilter = 'semua';
 
@@ -646,7 +646,7 @@
     document.getElementById('banner-nama').textContent = `Halo, ${firstName}! 👋`;
     document.getElementById('banner-sem').textContent  = currentUser.semester ? `Semester ${currentUser.semester}` : 'Mahasiswa';
 
-    await Promise.all([loadMatkul(), loadTugas()]);
+    await Promise.all([loadKelas(), loadTugas()]);
     updateBanner();
   })();
 
@@ -698,25 +698,42 @@
   // ═══════════════════════════════════════════════════════
   //  LOAD MATA KULIAH
   // ═══════════════════════════════════════════════════════
-  async function loadMatkul() {
-    try { allMatkul = await fetchMatkulByJurusan(); } catch(e) { allMatkul = []; }
+  async function loadKelas() {
+    try { allKelas = await fetchKelasSaya(); } catch(e) { allKelas = []; }
     renderMatkulGrid();
     renderBerandaMatkul();
     updateStats();
   }
 
-  async function fetchMatkulByJurusan() {
+  async function fetchKelasSaya() {
     try {
-      const url = currentUser.jurusan
-        ? `/api/matkul/list?jurusan=${encodeURIComponent(currentUser.jurusan)}`
-        : `/api/matkul/list`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error('Gagal memuat mata kuliah.');
+      const res = await fetch('/api/kelas/my-kelas', { headers: authHeaders() });
+      if (!res.ok) throw new Error('Gagal memuat data kelas.');
       const json = await res.json();
-      return (json.matkul || []).map(m => ({
-        id: m.id, nama: m.nama, kode: m.kode || '—',
-        sks: m.sks || '—', dosen_nama: m.dosen_nama || '—', jurusan: m.jurusan || '',
-      }));
+      // Ambil detail matkul untuk setiap kelas (nama, kode, sks, dosen)
+      let matkulMap = {};
+      try {
+        const mRes = await fetch('/api/matkul/list');
+        if (mRes.ok) {
+          const mJson = await mRes.json();
+          (mJson.matkul || []).forEach(m => { matkulMap[m.id] = m; });
+        }
+      } catch(e) {}
+      return (json.kelas || []).map(k => {
+        const mk = matkulMap[k.matkul_id] || {};
+        return {
+          id:         k.id,          // kelas_id — dipakai untuk absensi & diskusi
+          matkul_id:  k.matkul_id,
+          nama:       mk.nama        || k.nama_kelas || 'Kelas ' + k.id,
+          nama_kelas: k.nama_kelas   || '',
+          kode:       mk.kode        || '—',
+          sks:        mk.sks         || '—',
+          dosen_nama: mk.dosen_nama  || '—',
+          jurusan:    mk.jurusan     || k.prodi || '',
+          jadwal:     k.jadwal       || '',
+          semester:   k.semester     || '',
+        };
+      });
     } catch(e) { console.warn(e.message); return []; }
   }
 
@@ -815,16 +832,16 @@
 
   function renderBerandaMatkul() {
     const el = document.getElementById('beranda-matkul');
-    if (!allMatkul.length) {
+    if (!allKelas.length) {
       el.innerHTML = `<div class="empty-state"><span class="es-icon">📚</span><p>Belum ada mata kuliah aktif.</p></div>`;
       return;
     }
-    el.innerHTML = allMatkul.slice(0,5).map((m,i) => `
+    el.innerHTML = allKelas.slice(0,5).map((k,i) => `
       <div class="tugas-item">
         <div class="tugas-dot" style="background:${COVER_COLORS[i%COVER_COLORS.length]}"></div>
         <div class="flex-fill">
-          <div class="t-name">${m.nama}</div>
-          <div class="t-matkul">${m.dosen_nama !== '—' ? m.dosen_nama : ''}</div>
+          <div class="t-name">${k.nama}</div>
+          <div class="t-matkul">${k.dosen_nama !== '—' ? k.dosen_nama : ''}${k.jadwal ? ' · ' + k.jadwal : ''}</div>
         </div>
       </div>`).join('');
   }
@@ -832,22 +849,23 @@
   function renderMatkulGrid() {
     const el  = document.getElementById('matkul-grid');
     const sub = document.getElementById('matkul-sub');
-    if (!allMatkul.length) {
-      el.innerHTML = `<div class="col-12"><div class="empty-state"><span class="es-icon">📚</span><p><strong>Belum ada mata kuliah</strong></p></div></div>`;
+    if (!allKelas.length) {
+      el.innerHTML = `<div class="col-12"><div class="empty-state"><span class="es-icon">📚</span><p><strong>Belum ada mata kuliah</strong><br>Kamu belum terdaftar di kelas manapun.</p></div></div>`;
       return;
     }
-    sub.textContent = `${allMatkul.length} mata kuliah dari jurusan ${currentUser.jurusan || ''}.`;
-    el.innerHTML = allMatkul.map((m,i) => {
+    sub.textContent = `${allKelas.length} kelas aktif yang kamu ikuti.`;
+    el.innerHTML = allKelas.map((k,i) => {
       const color = COVER_COLORS[i%COVER_COLORS.length];
       return `<div class="col-sm-6 col-lg-4">
         <div class="matkul-card">
           <div class="matkul-cover" style="background:${color}"></div>
           <div class="p-3">
-            <div class="matkul-kode mb-1">${m.kode !== '—' ? m.kode : 'Mata Kuliah'}</div>
-            <div class="matkul-nama mb-1">${m.nama}</div>
-            <div class="text-muted mb-3" style="font-size:12px;">${m.dosen_nama !== '—' ? m.dosen_nama : '—'}</div>
+            <div class="matkul-kode mb-1">${k.kode !== '—' ? k.kode : 'Mata Kuliah'}${k.nama_kelas ? ' · ' + k.nama_kelas : ''}</div>
+            <div class="matkul-nama mb-1">${k.nama}</div>
+            <div class="text-muted mb-3" style="font-size:12px;">${k.dosen_nama !== '—' ? k.dosen_nama : '—'}${k.jadwal ? '<br>' + k.jadwal : ''}</div>
             <div class="d-flex gap-2 flex-wrap">
-              ${m.sks !== '—' ? `<span class="matkul-chip">${m.sks} SKS</span>` : ''}
+              ${k.sks !== '—' ? `<span class="matkul-chip">${k.sks} SKS</span>` : ''}
+              ${k.semester ? `<span class="matkul-chip" style="background:#F0FDF4;color:#16A34A">Sem ${k.semester}</span>` : ''}
               <span class="matkul-chip green">Aktif</span>
             </div>
           </div>
@@ -857,7 +875,7 @@
   }
 
   function updateStats() {
-    document.getElementById('stat-matkul').textContent  = allMatkul.length || 0;
+    document.getElementById('stat-matkul').textContent  = allKelas.length || 0;
     document.getElementById('stat-tugas').textContent   = allTugas.filter(t=>t.status==='aktif').length;
     const jur = currentUser?.jurusan || '—';
     document.getElementById('stat-jurusan').textContent = jur.split(' ').slice(0,3).join(' ') + (jur.split(' ').length>3?'…':'');
@@ -882,8 +900,8 @@
   // ═══════════════════════════════════════════════════════
   //  ABSENSI — STATE
   // ═══════════════════════════════════════════════════════
-  let activeAbsMatkul = null;
-  let absTodayMatkul  = [];   // nama-nama matkul yang punya pertemuan hari ini
+  let activeAbsKelas  = null;  // kelas_id yang sedang dipilih
+  let absTodayKelas   = [];   // kelas_id yang punya pertemuan hari ini
   let absInitDone     = false;
 
   // ═══════════════════════════════════════════════════════
@@ -894,8 +912,8 @@
     const selectEl  = document.getElementById('abs-matkul-select');
     const badgeEl   = document.getElementById('abs-info-badge');
 
-    if (!allMatkul.length) {
-      selectEl.innerHTML = '<option value="">Tidak ada mata kuliah terdaftar</option>';
+    if (!allKelas.length) {
+      selectEl.innerHTML = '<option value="">Tidak ada kelas terdaftar</option>';
       badgeEl.innerHTML  = '';
       return;
     }
@@ -908,23 +926,23 @@
       Memeriksa jadwal hari ini...
     </span>`;
 
-    // Paralel: cek semua matkul yang punya pertemuan aktif hari ini
-    absTodayMatkul = [];
+    // Paralel: cek semua kelas yang punya pertemuan aktif hari ini
+    absTodayKelas = [];   // kelas_id yang ada pertemuan hari ini
     const today = new Date().toDateString();
-    await Promise.all(allMatkul.map(async m => {
+    await Promise.all(allKelas.map(async k => {
       try {
-        const res  = await fetch(`/api/absensi/list-pertemuan?matkul=${encodeURIComponent(m.nama)}`, { headers: authHeaders() });
+        const res  = await fetch(`/api/absensi/list-pertemuan?kelas_id=${encodeURIComponent(k.id)}`, { headers: authHeaders() });
         const data = await res.json();
         const hasToday = (data.pertemuan || []).some(p =>
           new Date(p.tanggal).toDateString() === today && p.status === 'aktif'
         );
-        if (hasToday) absTodayMatkul.push(m.nama);
+        if (hasToday) absTodayKelas.push(k.id);
       } catch(e) { /* lewati jika gagal */ }
     }));
 
     // Susun opsi: hari ini dulu, lalu yang lain
-    const todayList = allMatkul.filter(m => absTodayMatkul.includes(m.nama));
-    const otherList = allMatkul.filter(m => !absTodayMatkul.includes(m.nama));
+    const todayList = allKelas.filter(k => absTodayKelas.includes(k.id));
+    const otherList = allKelas.filter(k => !absTodayKelas.includes(k.id));
 
     selectEl.innerHTML = '';
     selectEl.disabled  = false;
@@ -932,10 +950,10 @@
     if (todayList.length) {
       const grp = document.createElement('optgroup');
       grp.label = '🔴 Ada Pertemuan Hari Ini';
-      todayList.forEach(m => {
+      todayList.forEach(k => {
         const opt = document.createElement('option');
-        opt.value       = m.nama;
-        opt.textContent = m.nama;
+        opt.value       = k.id;
+        opt.textContent = k.nama + (k.nama_kelas ? ' · ' + k.nama_kelas : '');
         grp.appendChild(opt);
       });
       selectEl.appendChild(grp);
@@ -943,52 +961,54 @@
 
     if (otherList.length) {
       const grp = document.createElement('optgroup');
-      grp.label = todayList.length ? '📚 Mata Kuliah Lainnya' : '📚 Semua Mata Kuliah';
-      otherList.forEach(m => {
+      grp.label = todayList.length ? '📚 Kelas Lainnya' : '📚 Semua Kelas';
+      otherList.forEach(k => {
         const opt = document.createElement('option');
-        opt.value       = m.nama;
-        opt.textContent = m.nama;
+        opt.value       = k.id;
+        opt.textContent = k.nama + (k.nama_kelas ? ' · ' + k.nama_kelas : '');
         grp.appendChild(opt);
       });
       selectEl.appendChild(grp);
     }
 
     // Pilih otomatis: utamakan yang ada pertemuan hari ini
-    const defaultMatkul = todayList.length ? todayList[0].nama : allMatkul[0].nama;
-    selectEl.value = defaultMatkul;
-    switchAbsMatkul(defaultMatkul);
+    const defaultKelas = todayList.length ? todayList[0] : allKelas[0];
+    selectEl.value = defaultKelas.id;
+    switchAbsKelas(defaultKelas.id);
   }
 
   // ═══════════════════════════════════════════════════════
   //  ABSENSI — SWITCH MATKUL
   // ═══════════════════════════════════════════════════════
-  function switchAbsMatkul(matkul) {
-    if (!matkul) return;
-    activeAbsMatkul = matkul;
+  function switchAbsKelas(kelasId) {
+    if (!kelasId) return;
+    activeAbsKelas = kelasId;
 
     // Update info badge
     const badgeEl = document.getElementById('abs-info-badge');
-    const isToday = absTodayMatkul.includes(matkul);
+    const isToday = absTodayKelas.includes(kelasId);
+    const kelasNama = (allKelas.find(k => k.id === kelasId) || {}).nama || kelasId;
     badgeEl.innerHTML = isToday
       ? `<span class="abs-info-badge abs-info-today">✅ Ada pertemuan aktif hari ini — kamu bisa absen sekarang</span>`
-      : `<span class="abs-info-badge abs-info-noday">📅 Tidak ada pertemuan hari ini — lihat riwayat absensi di bawah</span>`;
+      : `<span class="abs-info-badge abs-info-noday">📅 Tidak ada pertemuan hari ini untuk <strong>${kelasNama}</strong></span>`;
 
     // Reset progress
     document.getElementById('abs-progress-wrap').style.display = 'none';
 
-    loadAbsensiMhs(matkul);
+    loadAbsensiMhs(kelasId);
   }
 
   // ═══════════════════════════════════════════════════════
   //  ABSENSI — LOAD PERTEMUAN
   // ═══════════════════════════════════════════════════════
-  async function loadAbsensiMhs(matkul) {
+  async function loadAbsensiMhs(kelasId) {
     const container = document.getElementById('abs-pertemuan-content');
     container.innerHTML = '<div class="loading-row"><div class="spinner-sm"></div> Memuat pertemuan...</div>';
     try {
-      const res  = await fetch(`/api/absensi/list-pertemuan?matkul=${encodeURIComponent(matkul)}`, { headers: authHeaders() });
+      const res  = await fetch(`/api/absensi/list-pertemuan?kelas_id=${encodeURIComponent(kelasId)}`, { headers: authHeaders() });
       const data = await res.json();
-      renderAbsensiMhs(data.pertemuan || [], matkul);
+      const kelasNama = (allKelas.find(k => k.id === kelasId) || {}).nama || kelasId;
+      renderAbsensiMhs(data.pertemuan || [], kelasNama);
     } catch(e) {
       container.innerHTML = '<div class="text-center text-danger py-4" style="font-size:13px;">⚠️ Gagal memuat data pertemuan.</div>';
     }
@@ -1146,7 +1166,7 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Gagal submit absensi.');
       showToast(`Absensi "${judul}" berhasil dikirim!`);
-      loadAbsensiMhs(activeAbsMatkul);
+      loadAbsensiMhs(activeAbsKelas);
     } catch(e) { showToast(e.message); }
   }
 
@@ -1158,47 +1178,47 @@
 
   function renderDiskusiRooms() {
     const el = document.getElementById('diskusi-rooms');
-    if (!allMatkul.length) {
+    if (!allKelas.length) {
       el.innerHTML = '<div class="text-muted p-3" style="font-size:12px;">Belum ada ruang diskusi.</div>';
       return;
     }
-    el.innerHTML = allMatkul.map((m,i) => `
-      <div class="diskusi-room${i===0?' active':''}" onclick="selectRoom(this,'${m.nama}','${m.dosen_nama}')">
-        <div class="dr-name">${m.nama}</div>
-        <div class="dr-last" id="dr-mhs-last-${m.nama.replace(/\s+/g,'_')}">Klik untuk membuka</div>
+    el.innerHTML = allKelas.map((k,i) => `
+      <div class="diskusi-room${i===0?' active':''}" onclick="selectRoom(this,'${k.id}','${k.nama}','${k.dosen_nama}')">
+        <div class="dr-name">${k.nama}</div>
+        <div class="dr-last" id="dr-mhs-last-${k.id}">Klik untuk membuka</div>
       </div>`).join('');
-    if (allMatkul.length) selectRoom(el.querySelector('.diskusi-room'), allMatkul[0].nama, allMatkul[0].dosen_nama);
+    if (allKelas.length) selectRoom(el.querySelector('.diskusi-room'), allKelas[0].id, allKelas[0].nama, allKelas[0].dosen_nama);
   }
 
-  function selectRoom(el, matkulNama, dosenNama) {
+  function selectRoom(el, kelasId, kelasNama, dosenNama) {
     document.querySelectorAll('.diskusi-room').forEach(r => r.classList.remove('active'));
     el.classList.add('active');
-    activeDiskusi = matkulNama;
-    document.getElementById('chat-title').textContent = matkulNama;
+    activeDiskusi = kelasId;
+    document.getElementById('chat-title').textContent = kelasNama || kelasId;
     document.getElementById('chat-dosen').textContent = dosenNama || '—';
     if (diskusiPolling) clearInterval(diskusiPolling);
-    loadChatMessages(matkulNama);
-    diskusiPolling = setInterval(() => loadChatMessages(matkulNama), 15000);
+    loadChatMessages(kelasId);
+    diskusiPolling = setInterval(() => loadChatMessages(kelasId), 15000);
   }
 
-  async function loadChatMessages(matkul) {
+  async function loadChatMessages(kelasId) {
     try {
-      const res  = await fetch(`/api/diskusi/pesan?matkul=${encodeURIComponent(matkul)}&limit=60`, { headers: authHeaders() });
+      const res  = await fetch(`/api/diskusi/pesan?kelas_id=${encodeURIComponent(kelasId)}&limit=60`, { headers: authHeaders() });
       const data = await res.json();
-      renderChatMessages(data.pesan || [], matkul);
+      renderChatMessages(data.pesan || [], kelasId);
     } catch(e) {
       document.getElementById('chat-messages').innerHTML = '<div class="text-center text-danger p-4" style="font-size:13px;">Gagal memuat pesan.</div>';
     }
   }
 
-  function renderChatMessages(messages, matkul) {
+  function renderChatMessages(messages, kelasId) {
     const container = document.getElementById('chat-messages');
     const wasAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 50;
 
     if (!messages.length) {
       container.innerHTML = `<div class="chat-empty"><div>
         <span style="font-size:36px;display:block;margin-bottom:10px">💬</span>
-        Belum ada pesan di ruang <strong>${matkul}</strong>.<br>Mulai diskusi!
+        Belum ada pesan di ruang ini.<br>Mulai diskusi!
       </div></div>`;
       return;
     }
@@ -1220,9 +1240,9 @@
       </div>`;
     }).join('');
 
-    if (messages.length && matkul) {
+    if (messages.length) {
       const last  = messages[messages.length-1];
-      const drEl  = document.getElementById(`dr-mhs-last-${matkul.replace(/\s+/g,'_')}`);
+      const drEl  = document.getElementById(`dr-mhs-last-${kelasId}`);
       if (drEl) drEl.textContent = last.sender_nama.split(' ')[0]+': '+last.isi.substring(0,35)+(last.isi.length>35?'…':'');
     }
 
@@ -1241,7 +1261,7 @@
     try {
       const res = await fetch('/api/diskusi/kirim', {
         method:'POST', headers:authHeaders(),
-        body:JSON.stringify({ matkul:activeDiskusi, isi:text, nama:currentUser.nama })
+        body:JSON.stringify({ kelas_id: activeDiskusi, isi: text, nama: currentUser.nama })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
