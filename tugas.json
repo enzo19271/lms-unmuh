@@ -8,7 +8,17 @@
       "deadline": "2026-06-15T06:00",
       "dosen_id": "usr_1781045446222",
       "status": "aktif",
-      "created_at": "2026-06-09T23:00:25.468Z"
+      "created_at": "2026-06-09T23:00:25.468Z",
+      "pengumpulan": [
+        {
+          "mhs_id": "usr_1781090075804",
+          "nim": "250241117",
+          "nama": "Arlan Rengga",
+          "link": "https://google.com",
+          "catatan": "sudahh pak",
+          "submitted_at": "2026-06-11T05:41:40.285Z"
+        }
+      ]
     },
     {
       "id": "tgs_1781059730932",
