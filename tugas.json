@@ -70,16 +70,6 @@
       "dosen_id": "usr_1781069582657",
       "status": "aktif",
       "created_at": "2026-06-10T05:46:41.424Z"
-    },
-    {
-      "id": "tgs_1781092418051",
-      "judul": "Buatkan Makalah Tentang Figma",
-      "deskripsi": "Cobain",
-      "matkul": "UI UX",
-      "deadline": "2026-06-13T18:53",
-      "dosen_id": "usr_1781089978920",
-      "status": "aktif",
-      "created_at": "2026-06-10T11:53:38.051Z"
     }
   ]
 }
