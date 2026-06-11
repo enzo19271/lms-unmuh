@@ -167,6 +167,19 @@
         "created_at": "2026-06-11T10:30:38.697Z",
         "dihapus": false
       }
+    ],
+    "kelas_kls_1781165979185": [
+      {
+        "id": "msg_1781173861829_bku08",
+        "sender_id": "usr_1781166257496",
+        "sender_nim": "20230105",
+        "sender_nama": "Randi Putra, M. Pd.",
+        "role": "dosen",
+        "kelas_id": "kls_1781165979185",
+        "isi": "Kelas C ya, silahkan tugasnya nanti dikumpul di laman tugas, terimakasih",
+        "created_at": "2026-06-11T10:31:01.829Z",
+        "dihapus": false
+      }
     ]
   }
 }
