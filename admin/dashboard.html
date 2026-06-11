@@ -72,6 +72,7 @@
     .ic-green{background:var(--green-pale);color:var(--green)}
     .ic-yellow{background:var(--yellow-pale);color:var(--yellow)}
     .ic-purple{background:#F3E8FF;color:#7C3AED}
+    .ic-teal{background:#ECFEFF;color:#0891B2}
 
     /* CARD */
     .card{background:var(--white);border-radius:14px;border:1px solid var(--gray-200);overflow:hidden}
@@ -95,6 +96,7 @@
     .pill-red{background:var(--red-pale);color:var(--red)}
     .pill-purple{background:#F3E8FF;color:#7C3AED}
     .pill-gray{background:var(--gray-100);color:var(--gray-500)}
+    .pill-teal{background:#ECFEFF;color:#0891B2}
 
     /* TABLE */
     .table-wrap{background:white;border-radius:14px;border:1px solid var(--gray-200);overflow:hidden;overflow-x:auto}
@@ -125,8 +127,9 @@
     /* MODAL */
     .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;padding:20px}
     .modal-bg.open{display:flex}
-    .modal{background:white;border-radius:16px;width:100%;max-width:500px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.2)}
-    .modal-header{padding:20px 24px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between}
+    .modal{background:white;border-radius:16px;width:100%;max-width:500px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto}
+    .modal-lg{max-width:680px}
+    .modal-header{padding:20px 24px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:white;z-index:1}
     .modal-header h3{font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:800;color:var(--navy)}
     .modal-close{background:none;border:none;cursor:pointer;color:var(--gray-500);padding:4px;border-radius:6px;display:flex}
     .modal-close:hover{background:var(--gray-100)}
@@ -137,7 +140,7 @@
     .form-input{width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s;background:white;color:var(--gray-700)}
     .form-input:focus{border-color:var(--blue-light)}
     .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .modal-footer{padding:16px 24px;border-top:1px solid var(--gray-100);display:flex;justify-content:flex-end;gap:10px}
+    .modal-footer{padding:16px 24px;border-top:1px solid var(--gray-100);display:flex;justify-content:flex-end;gap:10px;position:sticky;bottom:0;background:white}
     .btn-md{padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;border:none}
 
     /* CONFIRM MODAL */
@@ -160,6 +163,15 @@
     .jks-num{font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:800;color:var(--navy)}
     .jks-label{font-size:10px;color:var(--gray-500);text-transform:uppercase;letter-spacing:.3px}
     .jk-actions{display:flex;gap:8px}
+
+    /* KELAS ASSIGN MODAL */
+    .mhs-check-list{max-height:280px;overflow-y:auto;border:1.5px solid var(--gray-200);border-radius:8px}
+    .mhs-check-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--gray-100);cursor:pointer;transition:background .1s}
+    .mhs-check-item:last-child{border-bottom:none}
+    .mhs-check-item:hover{background:var(--gray-50)}
+    .mhs-check-item input{width:16px;height:16px;cursor:pointer;accent-color:var(--blue-light)}
+    .mhs-check-item label{font-size:13px;cursor:pointer;flex:1}
+    .mhs-check-item .mhs-nim{font-size:11px;color:var(--gray-500)}
 
     /* ACTIVITY ROW */
     .act-row{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--gray-100)}
@@ -316,6 +328,54 @@
   </div>
 </div>
 
+<!-- MODAL: TAMBAH / EDIT KELAS -->
+<div class="modal-bg" id="modal-kelas">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-kls-title">Tambah Kelas</h3>
+      <button class="modal-close" onclick="closeModalKelas()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="fkls-id"/>
+      <div class="form-group"><label>Mata Kuliah</label><select class="form-input" id="fkls-matkul"><option value="">Pilih mata kuliah...</option></select></div>
+      <div class="form-row">
+        <div class="form-group"><label>Nama Kelas</label><input type="text" class="form-input" id="fkls-nama" placeholder="cth. Kelas A"/></div>
+        <div class="form-group"><label>Semester</label><select class="form-input" id="fkls-semester"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Program Studi (Prodi)</label><select class="form-input" id="fkls-prodi"><option value="">Pilih jurusan...</option></select></div>
+        <div class="form-group"><label>Dosen Pengampu</label><select class="form-input" id="fkls-dosen"><option value="">Pilih dosen...</option></select></div>
+      </div>
+      <div class="form-group"><label>Jadwal <span style="color:var(--gray-500);font-weight:400">(opsional)</span></label><input type="text" class="form-input" id="fkls-jadwal" placeholder="cth. Senin 08:00-10:00"/></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-md" onclick="closeModalKelas()" style="background:var(--gray-100);color:var(--gray-700)">Batal</button>
+      <button class="btn-md btn-primary" onclick="submitKelas()" style="background:var(--blue);color:white" id="btn-submit-kls">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: KELOLA MAHASISWA KELAS -->
+<div class="modal-bg" id="modal-assign-mhs">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3 id="modal-assign-title">Kelola Mahasiswa Kelas</h3>
+      <button class="modal-close" onclick="closeModalAssign()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:12px;color:var(--gray-500);margin-bottom:12px">Centang mahasiswa yang akan dimasukkan ke kelas ini. Data yang ada akan diperbarui sesuai pilihan.</p>
+      <input type="text" class="form-input" id="assign-search" placeholder="Cari nama atau NIM mahasiswa..." oninput="filterAssignList(this.value)" style="margin-bottom:10px"/>
+      <div class="mhs-check-list" id="mhs-check-list">
+        <div style="padding:20px;text-align:center;color:var(--gray-500);font-size:13px">Memuat data mahasiswa...</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-md" onclick="closeModalAssign()" style="background:var(--gray-100);color:var(--gray-700)">Batal</button>
+      <button class="btn-md btn-primary" onclick="submitAssignMhs()" style="background:var(--blue);color:white">Simpan Anggota</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: KONFIRMASI HAPUS -->
 <div class="modal-bg" id="modal-confirm">
   <div class="modal confirm-modal">
@@ -356,6 +416,9 @@
       <button class="nav-item" onclick="showPage('matkul')">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>Mata Kuliah
       </button>
+      <button class="nav-item" onclick="showPage('kelas')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.34C18 2.54 15.5.06 12.34.06c-1.71 0-3.26.73-4.34 1.9L6.59 3.39C5.58 2.53 4.26 2 2.82 2 .1 2-1.65 4.54-.77 7.02L2 14h20l-2-8zM6.5 9A1.5 1.5 0 0 1 5 7.5 1.5 1.5 0 0 1 6.5 6 1.5 1.5 0 0 1 8 7.5 1.5 1.5 0 0 1 6.5 9zm11 0A1.5 1.5 0 0 1 16 7.5 1.5 1.5 0 0 1 17.5 6 1.5 1.5 0 0 1 19 7.5 1.5 1.5 0 0 1 17.5 9zM2 16v2c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-2H2z"/></svg>Kelola Kelas
+      </button>
     </div>
     <div class="nav-section">
       <div class="nav-label">Sistem</div>
@@ -390,7 +453,7 @@
     <div class="banner">
       <div class="banner-text">
         <h3 id="banner-nama">Selamat Datang, Admin! 🛡️</h3>
-        <p id="banner-sub">Sistem berjalan normal. Kelola pengguna, jurusan, dan mata kuliah melalui panel ini.</p>
+        <p id="banner-sub">Sistem berjalan normal. Kelola pengguna, jurusan, mata kuliah, dan kelas melalui panel ini.</p>
       </div>
       <div class="banner-badge">Super Admin</div>
     </div>
@@ -399,6 +462,10 @@
       <div class="stat-card"><div class="sc-icon ic-yellow"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 17a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H9.46c.35.61.54 1.3.54 2h10v11h-9v2h3v2h2v-2h3v2h2v-2h-2z"/></svg></div><div class="sc-label">Total Dosen</div><div class="sc-num" id="stat-dosen">—</div><div class="sc-sub">Aktif mengajar</div></div>
       <div class="stat-card"><div class="sc-icon ic-green"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg></div><div class="sc-label">Jurusan</div><div class="sc-num" id="stat-jurusan">—</div><div class="sc-sub">Program studi</div></div>
       <div class="stat-card"><div class="sc-icon ic-purple"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg></div><div class="sc-label">Mata Kuliah</div><div class="sc-num" id="stat-matkul">—</div><div class="sc-sub">Terdaftar</div></div>
+    </div>
+    <div class="stats-grid" style="grid-template-columns:repeat(2,1fr);margin-bottom:24px">
+      <div class="stat-card"><div class="sc-icon ic-teal"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.34C18 2.54 15.5.06 12.34.06c-1.71 0-3.26.73-4.34 1.9L6.59 3.39C5.58 2.53 4.26 2 2.82 2 .1 2-1.65 4.54-.77 7.02L2 14h20l-2-8z"/></svg></div><div class="sc-label">Total Kelas</div><div class="sc-num" id="stat-kelas">—</div><div class="sc-sub">Aktif semester ini</div></div>
+      <div class="stat-card"><div class="sc-icon ic-purple"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div><div class="sc-label">Total Admin</div><div class="sc-num" id="stat-admin">—</div><div class="sc-sub">Administrator sistem</div></div>
     </div>
     <div class="two-col">
       <div class="card">
@@ -425,7 +492,7 @@
       </button>
     </div>
     <div class="toolbar">
-      <input type="text" class="search-input" placeholder="Cari nama atau NIM/NIP..." oninput="filterUsers(this.value)" id="user-search"/>
+      <input type="text" class="search-input" placeholder="Cari nama atau NIM/NIP..." oninput="filterUsers()" id="user-search"/>
       <select class="filter-select" onchange="filterUsers()" id="user-role-filter">
         <option value="">Semua Role</option>
         <option value="mahasiswa">Mahasiswa</option>
@@ -468,7 +535,7 @@
       </button>
     </div>
     <div class="toolbar">
-      <input type="text" class="search-input" placeholder="Cari nama atau kode mata kuliah..." oninput="filterMatkul(this.value)" id="matkul-search"/>
+      <input type="text" class="search-input" placeholder="Cari nama atau kode mata kuliah..." oninput="filterMatkul()" id="matkul-search"/>
       <select class="filter-select" onchange="filterMatkul()" id="matkul-jurusan-filter">
         <option value="">Semua Jurusan</option>
       </select>
@@ -478,6 +545,33 @@
         <thead><tr><th>Kode</th><th>Nama Mata Kuliah</th><th>Jurusan</th><th>Dosen</th><th>SKS</th><th>Aksi</th></tr></thead>
         <tbody id="matkul-tbody">
           <tr><td colspan="6" style="text-align:center;padding:32px;color:var(--gray-500)">Memuat data mata kuliah...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- KELOLA KELAS -->
+  <div class="content" id="page-kelas">
+    <div class="page-header">
+      <div class="page-header-left"><h2>Kelola Kelas</h2><p>Manajemen kelas, jadwal, dan daftar mahasiswa</p></div>
+      <button class="btn btn-primary" onclick="openModalKelas('add')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>Tambah Kelas
+      </button>
+    </div>
+    <div class="toolbar">
+      <input type="text" class="search-input" placeholder="Cari nama kelas atau mata kuliah..." oninput="filterKelas()" id="kelas-search"/>
+      <select class="filter-select" onchange="filterKelas()" id="kelas-matkul-filter">
+        <option value="">Semua Mata Kuliah</option>
+      </select>
+      <select class="filter-select" onchange="filterKelas()" id="kelas-prodi-filter">
+        <option value="">Semua Prodi</option>
+      </select>
+    </div>
+    <div class="table-wrap">
+      <table class="main-table">
+        <thead><tr><th>Nama Kelas</th><th>Mata Kuliah</th><th>Prodi / Semester</th><th>Dosen</th><th>Jadwal</th><th>Mahasiswa</th><th>Aksi</th></tr></thead>
+        <tbody id="kelas-tbody">
+          <tr><td colspan="7" style="text-align:center;padding:32px;color:var(--gray-500)">Memuat data kelas...</td></tr>
         </tbody>
       </table>
     </div>
@@ -521,10 +615,12 @@
   let allUsers    = [];
   let allJurusan  = [];
   let allMatkul   = [];
+  let allKelas    = [];
+  let assignKelasId = null;
   const ADMIN_KEY = sessionStorage.getItem('lms_admin_key') || '';
 
-  const pages  = ['beranda','users','jurusan','matkul','profil'];
-  const titles = {beranda:'Beranda',users:'Kelola Pengguna',jurusan:'Jurusan & Prodi',matkul:'Mata Kuliah',profil:'Profil & Akun'};
+  const pages  = ['beranda','users','jurusan','matkul','kelas','profil'];
+  const titles = {beranda:'Beranda',users:'Kelola Pengguna',jurusan:'Jurusan & Prodi',matkul:'Mata Kuliah',kelas:'Kelola Kelas',profil:'Profil & Akun'};
 
   // ─── INIT ──────────────────────────────────────────────────────────────────
 
@@ -541,7 +637,7 @@
     document.getElementById('profil-id').textContent   = currentUser.nim_nip;
     document.getElementById('banner-nama').textContent  = `Selamat Datang, ${currentUser.nama.split(' ')[0]}! 🛡️`;
 
-    await Promise.all([loadUsers(), loadJurusan(), loadMatkul()]);
+    await Promise.all([loadUsers(), loadJurusan(), loadMatkul(), loadKelas()]);
     showPage('beranda');
   })();
 
@@ -551,7 +647,7 @@
     return { 'Content-Type': 'application/json', 'x-admin-key': ADMIN_KEY };
   }
 
-  function adminBody(extra) {
+  function adminBody(extra = {}) {
     return JSON.stringify({ key: ADMIN_KEY, ...extra });
   }
 
@@ -559,7 +655,7 @@
 
   async function loadUsers() {
     try {
-      const res  = await fetch('/api/auth/list-users', { method:'POST', headers: adminHeaders(), body: adminBody() });
+      const res  = await fetch('/api/auth/list-users', { method: 'POST', headers: adminHeaders(), body: adminBody() });
       const data = await res.json();
       if (!res.ok) { showToast('Gagal memuat pengguna: ' + (data.error||'')); return; }
       allUsers = data.users || [];
@@ -567,8 +663,9 @@
       renderRecentUsers(allUsers);
       document.getElementById('stat-mhs').textContent   = allUsers.filter(u=>u.role==='mahasiswa').length;
       document.getElementById('stat-dosen').textContent = allUsers.filter(u=>u.role==='dosen').length;
+      document.getElementById('stat-admin').textContent = allUsers.filter(u=>u.role==='admin').length;
       renderActivityLog(allUsers);
-    } catch(e) { showToast('Tidak dapat terhubung ke server.'); }
+    } catch { showToast('Tidak dapat terhubung ke server.'); }
   }
 
   function renderUsers(users) {
@@ -609,10 +706,7 @@
     const roleColor = { mahasiswa:'pill-blue', dosen:'pill-yellow', admin:'pill-purple' };
     const roleLabel = { mahasiswa:'Mahasiswa', dosen:'Dosen', admin:'Admin' };
     const avColor   = { mahasiswa:'var(--blue-light)', dosen:'var(--gold)', admin:'#7C3AED' };
-    if (!recent.length) {
-      el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">Belum ada pengguna.</div>';
-      return;
-    }
+    if (!recent.length) { el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">Belum ada pengguna.</div>'; return; }
     el.innerHTML = recent.map(u => {
       const inisial = u.nama.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
       return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--gray-100)">
@@ -625,13 +719,10 @@
 
   function renderActivityLog(users) {
     const el = document.getElementById('activity-log');
-    const dotColor = { mahasiswa:'var(--blue)', dosen:'var(--gold)', admin:'#7C3AED' };
+    const dotColor  = { mahasiswa:'var(--blue)', dosen:'var(--gold)', admin:'#7C3AED' };
     const roleLabel = { mahasiswa:'Mahasiswa', dosen:'Dosen', admin:'Admin' };
     const recent = [...users].sort((a,b) => new Date(b.created_at)-new Date(a.created_at)).slice(0,5);
-    if (!recent.length) {
-      el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">Belum ada aktivitas.</div>';
-      return;
-    }
+    if (!recent.length) { el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">Belum ada aktivitas.</div>'; return; }
     el.innerHTML = recent.map(u => {
       const tanggal = new Date(u.created_at).toLocaleDateString('id-ID', {day:'2-digit',month:'short',year:'numeric'});
       return `<div class="act-row">
@@ -653,7 +744,6 @@
     ));
   }
 
-  // Modal User
   function openModalUser(mode='add') {
     document.getElementById('modal-user-title').textContent = mode==='add' ? 'Tambah Pengguna' : 'Edit Pengguna';
     document.getElementById('btn-submit-user').textContent  = mode==='add' ? 'Simpan' : 'Update';
@@ -664,7 +754,6 @@
       document.getElementById('f-semester').value = '';
       document.getElementById('f-group-password').style.display = 'block';
     }
-    // Isi dropdown jurusan dari data real
     populateJurusanDropdown('f-jurusan');
     toggleRoleFields();
     document.getElementById('modal-user').classList.add('open');
@@ -692,14 +781,14 @@
   }
 
   async function submitUser() {
-    const id       = document.getElementById('f-user-id').value;
-    const nim_nip  = document.getElementById('f-nim-nip').value.trim();
-    const nama     = document.getElementById('f-nama').value.trim();
-    const role     = document.getElementById('f-role').value;
-    const password = document.getElementById('f-password').value;
-    const jurusan  = document.getElementById('f-jurusan').value;
-    const semester = document.getElementById('f-semester').value;
-    const mk_raw   = document.getElementById('f-matkul').value;
+    const id          = document.getElementById('f-user-id').value;
+    const nim_nip     = document.getElementById('f-nim-nip').value.trim();
+    const nama        = document.getElementById('f-nama').value.trim();
+    const role        = document.getElementById('f-role').value;
+    const password    = document.getElementById('f-password').value;
+    const jurusan     = document.getElementById('f-jurusan').value;
+    const semester    = document.getElementById('f-semester').value;
+    const mk_raw      = document.getElementById('f-matkul').value;
     const mata_kuliah = mk_raw ? mk_raw.split(',').map(s=>s.trim()).filter(Boolean) : [];
     const isEdit = !!id;
 
@@ -712,7 +801,7 @@
 
     const action = isEdit ? 'update-user' : 'register';
     try {
-      const res  = await fetch(`/api/auth/${action}`, { method:'POST', headers: adminHeaders(), body: JSON.stringify(body) });
+      const res  = await fetch(`/api/auth/${action}`, { method: 'POST', headers: adminHeaders(), body: JSON.stringify(body) });
       const data = await res.json();
       if (!res.ok) { showToast(data.error||'Gagal menyimpan.'); return; }
       showToast(isEdit ? 'Data pengguna diperbarui!' : 'Pengguna berhasil ditambahkan!');
@@ -726,7 +815,7 @@
     document.getElementById('btn-confirm-ok').onclick = async () => {
       closeConfirm();
       try {
-        const res  = await fetch('/api/auth/delete-user', { method:'POST', headers: adminHeaders(), body: adminBody({ id }) });
+        const res  = await fetch('/api/auth/delete-user', { method: 'POST', headers: adminHeaders(), body: adminBody({ id }) });
         const data = await res.json();
         if (!res.ok) { showToast(data.error||'Gagal menghapus.'); return; }
         showToast(`Akun "${nama}" berhasil dihapus.`);
@@ -740,13 +829,14 @@
 
   async function loadJurusan() {
     try {
-      const res  = await fetch('/api/jurusan/list', { method:'POST', headers: adminHeaders(), body: adminBody() });
+      // list-admin membutuhkan x-admin-key, mengembalikan semua data jurusan
+      const res  = await fetch('/api/jurusan/list-admin', { method: 'POST', headers: adminHeaders(), body: adminBody() });
       const data = await res.json();
       if (!res.ok) { showToast('Gagal memuat jurusan: ' + (data.error||'')); return; }
       allJurusan = data.jurusan || [];
       renderJurusan(allJurusan);
       document.getElementById('stat-jurusan').textContent = allJurusan.length;
-    } catch(e) { showToast('Tidak dapat memuat data jurusan.'); }
+    } catch { showToast('Tidak dapat memuat data jurusan.'); }
   }
 
   const CARD_COLORS = ['var(--blue-light)','var(--gold)','#16A34A','#7C3AED','#DB2777','#0891B2','#EA580C','#65A30D'];
@@ -758,10 +848,10 @@
       return;
     }
     grid.innerHTML = list.map((j, i) => {
-      const color = CARD_COLORS[i % CARD_COLORS.length];
-      const mhsCount  = allUsers.filter(u => u.role==='mahasiswa' && u.jurusan===j.nama).length;
-      const dosenCount= allUsers.filter(u => u.role==='dosen'     && u.jurusan===j.nama).length;
-      const mkCount   = allMatkul.filter(m => m.jurusan===j.nama).length;
+      const color      = CARD_COLORS[i % CARD_COLORS.length];
+      const mhsCount   = allUsers.filter(u => u.role==='mahasiswa' && u.jurusan===j.nama).length;
+      const dosenCount = allUsers.filter(u => u.role==='dosen'     && u.jurusan===j.nama).length;
+      const mkCount    = allMatkul.filter(m => m.jurusan===j.nama).length;
       return `<div class="jurusan-card">
         <div class="jk-cover" style="background:${color}"></div>
         <div class="jk-body">
@@ -790,9 +880,9 @@
 
   function populateJurusanDropdown(selectId, selected='') {
     const sel = document.getElementById(selectId);
-    const currentVal = selected || sel.value;
+    const cur = selected || sel.value;
     sel.innerHTML = '<option value="">Pilih jurusan...</option>' +
-      allJurusan.map(j => `<option value="${j.nama}" ${j.nama===currentVal?'selected':''}>${j.nama}</option>`).join('');
+      allJurusan.map(j => `<option value="${j.nama}" ${j.nama===cur?'selected':''}>${j.nama}</option>`).join('');
   }
 
   function openModalJurusan(mode='add', data=null) {
@@ -800,26 +890,26 @@
     if (mode==='add') {
       ['fj-kode','fj-nama','fj-fakultas'].forEach(id => document.getElementById(id).value='');
       document.getElementById('fj-jenjang').value = 'S1';
-      document.getElementById('fj-id') && (document.getElementById('fj-id').value='');
+      document.getElementById('fj-id').value = '';
     } else if (data) {
-      document.getElementById('fj-id').value      = data.id;
-      document.getElementById('fj-kode').value    = data.kode;
-      document.getElementById('fj-nama').value    = data.nama;
-      document.getElementById('fj-fakultas').value= data.fakultas||'';
-      document.getElementById('fj-jenjang').value = data.jenjang||'S1';
+      document.getElementById('fj-id').value       = data.id;
+      document.getElementById('fj-kode').value     = data.kode;
+      document.getElementById('fj-nama').value     = data.nama;
+      document.getElementById('fj-fakultas').value = data.fakultas||'';
+      document.getElementById('fj-jenjang').value  = data.jenjang||'S1';
     }
     document.getElementById('modal-jurusan').classList.add('open');
   }
 
-  function editJurusan(j) { openModalJurusan('edit', j); }
+  function editJurusan(j)   { openModalJurusan('edit', j); }
   function closeModalJurusan() { document.getElementById('modal-jurusan').classList.remove('open'); }
 
   async function submitJurusan() {
-    const id      = document.getElementById('fj-id') ? document.getElementById('fj-id').value : '';
-    const nama    = document.getElementById('fj-nama').value.trim();
-    const kode    = document.getElementById('fj-kode').value.trim();
-    const fakultas= document.getElementById('fj-fakultas').value.trim();
-    const jenjang = document.getElementById('fj-jenjang').value;
+    const id       = document.getElementById('fj-id').value;
+    const nama     = document.getElementById('fj-nama').value.trim();
+    const kode     = document.getElementById('fj-kode').value.trim();
+    const fakultas = document.getElementById('fj-fakultas').value.trim();
+    const jenjang  = document.getElementById('fj-jenjang').value;
     if (!nama||!kode) { showToast('Nama dan kode jurusan wajib diisi!'); return; }
 
     const action = id ? 'update' : 'add';
@@ -827,16 +917,17 @@
     if (id) body.id = id;
 
     try {
-      const res  = await fetch(`/api/jurusan/${action}`, { method:'POST', headers: adminHeaders(), body: JSON.stringify(body) });
+      const res  = await fetch(`/api/jurusan/${action}`, { method: 'POST', headers: adminHeaders(), body: JSON.stringify(body) });
       const data = await res.json();
       if (!res.ok) { showToast(data.error||'Gagal menyimpan jurusan.'); return; }
       showToast(id ? 'Jurusan diperbarui!' : `Jurusan "${nama}" ditambahkan!`);
       closeModalJurusan();
-      ['fj-kode','fj-nama','fj-fakultas'].forEach(i => document.getElementById(i).value='');
       await loadJurusan();
-      // Refresh dropdowns & matkul filter
       populateJurusanDropdown('f-jurusan');
+      populateJurusanDropdown('fmk-jurusan');
+      populateJurusanDropdown('fkls-prodi');
       updateMatkulJurusanFilter();
+      updateKelasProdiFilter();
     } catch { showToast('Tidak dapat terhubung ke server.'); }
   }
 
@@ -845,7 +936,7 @@
     document.getElementById('btn-confirm-ok').onclick = async () => {
       closeConfirm();
       try {
-        const res  = await fetch('/api/jurusan/delete', { method:'POST', headers: adminHeaders(), body: adminBody({ id }) });
+        const res  = await fetch('/api/jurusan/delete', { method: 'POST', headers: adminHeaders(), body: adminBody({ id }) });
         const data = await res.json();
         if (!res.ok) { showToast(data.error||'Gagal menghapus.'); return; }
         showToast(`Jurusan "${nama}" dihapus.`);
@@ -859,14 +950,16 @@
 
   async function loadMatkul() {
     try {
-      const res  = await fetch('/api/matkul/list', { method:'POST', headers: adminHeaders(), body: adminBody() });
+      // list-admin membutuhkan x-admin-key
+      const res  = await fetch('/api/matkul/list-admin', { method: 'POST', headers: adminHeaders(), body: adminBody() });
       const data = await res.json();
       if (!res.ok) { showToast('Gagal memuat mata kuliah: ' + (data.error||'')); return; }
       allMatkul = data.matkul || [];
       renderMatkul(allMatkul);
       document.getElementById('stat-matkul').textContent = allMatkul.length;
       updateMatkulJurusanFilter();
-    } catch(e) { showToast('Tidak dapat memuat data mata kuliah.'); }
+      updateKelasMatkulFilter();
+    } catch { showToast('Tidak dapat memuat data mata kuliah.'); }
   }
 
   function renderMatkul(list) {
@@ -892,8 +985,8 @@
     </tr>`).join('');
   }
 
-  function filterMatkul(q) {
-    const search  = (q || document.getElementById('matkul-search').value || '').toLowerCase();
+  function filterMatkul() {
+    const search  = document.getElementById('matkul-search').value.toLowerCase();
     const jurusan = document.getElementById('matkul-jurusan-filter').value;
     renderMatkul(allMatkul.filter(m =>
       (m.nama.toLowerCase().includes(search) || m.kode.toLowerCase().includes(search)) &&
@@ -909,8 +1002,8 @@
   }
 
   function openModalMatkul(mode='add') {
-    document.getElementById('modal-mk-title').textContent   = mode==='add' ? 'Tambah Mata Kuliah' : 'Edit Mata Kuliah';
-    document.getElementById('btn-submit-mk').textContent    = mode==='add' ? 'Simpan' : 'Update';
+    document.getElementById('modal-mk-title').textContent = mode==='add' ? 'Tambah Mata Kuliah' : 'Edit Mata Kuliah';
+    document.getElementById('btn-submit-mk').textContent  = mode==='add' ? 'Simpan' : 'Update';
     if (mode==='add') {
       ['fmk-id','fmk-kode','fmk-nama','fmk-dosen'].forEach(id => document.getElementById(id).value='');
       document.getElementById('fmk-sks').value = '3';
@@ -932,11 +1025,11 @@
   function closeModalMatkul() { document.getElementById('modal-matkul').classList.remove('open'); }
 
   async function submitMatkul() {
-    const id      = document.getElementById('fmk-id').value;
-    const kode    = document.getElementById('fmk-kode').value.trim();
-    const nama    = document.getElementById('fmk-nama').value.trim();
-    const sks     = document.getElementById('fmk-sks').value;
-    const jurusan = document.getElementById('fmk-jurusan').value;
+    const id         = document.getElementById('fmk-id').value;
+    const kode       = document.getElementById('fmk-kode').value.trim();
+    const nama       = document.getElementById('fmk-nama').value.trim();
+    const sks        = document.getElementById('fmk-sks').value;
+    const jurusan    = document.getElementById('fmk-jurusan').value;
     const dosen_nama = document.getElementById('fmk-dosen').value.trim();
     if (!kode||!nama) { showToast('Nama dan kode mata kuliah wajib diisi!'); return; }
 
@@ -945,7 +1038,7 @@
     if (id) body.id = id;
 
     try {
-      const res  = await fetch(`/api/matkul/${action}`, { method:'POST', headers: adminHeaders(), body: JSON.stringify(body) });
+      const res  = await fetch(`/api/matkul/${action}`, { method: 'POST', headers: adminHeaders(), body: JSON.stringify(body) });
       const data = await res.json();
       if (!res.ok) { showToast(data.error||'Gagal menyimpan mata kuliah.'); return; }
       showToast(id ? 'Mata kuliah diperbarui!' : `Mata kuliah "${nama}" ditambahkan!`);
@@ -959,7 +1052,7 @@
     document.getElementById('btn-confirm-ok').onclick = async () => {
       closeConfirm();
       try {
-        const res  = await fetch('/api/matkul/delete', { method:'POST', headers: adminHeaders(), body: adminBody({ id }) });
+        const res  = await fetch('/api/matkul/delete', { method: 'POST', headers: adminHeaders(), body: adminBody({ id }) });
         const data = await res.json();
         if (!res.ok) { showToast(data.error||'Gagal menghapus.'); return; }
         showToast(`Mata kuliah "${nama}" dihapus.`);
@@ -969,13 +1062,245 @@
     document.getElementById('modal-confirm').classList.add('open');
   }
 
-  // ─── CONFIRM / SHARED ─────────────────────────────────────────────────────
+  // ─── KELAS ────────────────────────────────────────────────────────────────
 
-  function confirmDelete(label) {
-    document.getElementById('confirm-msg').textContent = `Data "${label}" akan dihapus secara permanen.`;
-    document.getElementById('btn-confirm-ok').onclick = () => { closeConfirm(); showToast(`${label} dihapus.`); };
+  async function loadKelas() {
+    try {
+      const res  = await fetch('/api/kelas/list-admin', { method: 'POST', headers: adminHeaders(), body: adminBody() });
+      const data = await res.json();
+      if (!res.ok) { showToast('Gagal memuat kelas: ' + (data.error||'')); return; }
+      allKelas = data.kelas || [];
+      renderKelas(allKelas);
+      document.getElementById('stat-kelas').textContent = allKelas.length;
+      updateKelasMatkulFilter();
+      updateKelasProdiFilter();
+    } catch { showToast('Tidak dapat memuat data kelas.'); }
+  }
+
+  function getMatkulNama(matkul_id) {
+    const mk = allMatkul.find(m => m.id === matkul_id);
+    return mk ? mk.nama : matkul_id;
+  }
+
+  function getDosenNama(dosen_id) {
+    const d = allUsers.find(u => u.id === dosen_id && u.role === 'dosen');
+    return d ? d.nama : (dosen_id || '—');
+  }
+
+  function renderKelas(list) {
+    const tbody = document.getElementById('kelas-tbody');
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--gray-500)">Belum ada kelas. Klik <strong>Tambah Kelas</strong> untuk memulai.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map(k => {
+      const mhsJumlah = (k.mahasiswa||[]).length;
+      return `<tr>
+        <td style="font-weight:600;color:var(--navy)">${k.nama_kelas}</td>
+        <td style="font-size:12px">${getMatkulNama(k.matkul_id)}</td>
+        <td><span class="pill pill-blue">${k.prodi||'—'}</span><span style="font-size:11px;color:var(--gray-500);margin-left:4px">Sem. ${k.semester||'—'}</span></td>
+        <td style="font-size:12px;color:var(--gray-500)">${getDosenNama(k.dosen_id)}</td>
+        <td style="font-size:12px;color:var(--gray-500)">${k.jadwal||'—'}</td>
+        <td><span class="pill pill-teal" style="cursor:pointer" onclick="openModalAssign('${k.id}')" title="Kelola mahasiswa">${mhsJumlah} orang</span></td>
+        <td><div style="display:flex;gap:6px">
+          <button class="btn btn-icon" title="Edit" onclick='editKelas(${JSON.stringify(k).replace(/'/g,"&#39;")})'>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+          </button>
+          <button class="btn btn-icon" title="Kelola Mahasiswa" style="background:var(--blue-pale);color:var(--blue)" onclick="openModalAssign('${k.id}')">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+          </button>
+          <button class="btn btn-icon btn-danger" title="Hapus" onclick="deleteKelas('${k.id}','${k.nama_kelas.replace(/'/g,"\\'")}')">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+          </button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  }
+
+  function filterKelas() {
+    const search = document.getElementById('kelas-search').value.toLowerCase();
+    const mkId   = document.getElementById('kelas-matkul-filter').value;
+    const prodi  = document.getElementById('kelas-prodi-filter').value;
+    renderKelas(allKelas.filter(k => {
+      const mkNama = getMatkulNama(k.matkul_id).toLowerCase();
+      return (k.nama_kelas.toLowerCase().includes(search) || mkNama.includes(search)) &&
+             (!mkId  || k.matkul_id === mkId) &&
+             (!prodi || k.prodi     === prodi);
+    }));
+  }
+
+  function updateKelasMatkulFilter() {
+    const sel = document.getElementById('kelas-matkul-filter');
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">Semua Mata Kuliah</option>' +
+      allMatkul.map(m => `<option value="${m.id}" ${m.id===cur?'selected':''}>${m.nama}</option>`).join('');
+  }
+
+  function updateKelasProdiFilter() {
+    const sel  = document.getElementById('kelas-prodi-filter');
+    const cur  = sel.value;
+    const opts = [...new Set(allJurusan.map(j => j.nama))];
+    sel.innerHTML = '<option value="">Semua Prodi</option>' +
+      opts.map(p => `<option value="${p}" ${p===cur?'selected':''}>${p}</option>`).join('');
+  }
+
+  function populateDosenDropdown(selectId, selected='') {
+    const sel = document.getElementById(selectId);
+    const cur = selected || sel.value;
+    const dosens = allUsers.filter(u => u.role === 'dosen');
+    sel.innerHTML = '<option value="">Pilih dosen...</option>' +
+      dosens.map(d => `<option value="${d.id}" ${d.id===cur?'selected':''}>${d.nama}</option>`).join('');
+  }
+
+  function populateMatkulDropdown(selectId, selected='') {
+    const sel = document.getElementById(selectId);
+    const cur = selected || sel.value;
+    sel.innerHTML = '<option value="">Pilih mata kuliah...</option>' +
+      allMatkul.map(m => `<option value="${m.id}" ${m.id===cur?'selected':''}>${m.nama} (${m.kode})</option>`).join('');
+  }
+
+  function openModalKelas(mode='add') {
+    document.getElementById('modal-kls-title').textContent = mode==='add' ? 'Tambah Kelas' : 'Edit Kelas';
+    document.getElementById('btn-submit-kls').textContent  = mode==='add' ? 'Simpan' : 'Update';
+    if (mode==='add') {
+      ['fkls-id','fkls-nama','fkls-jadwal'].forEach(id => document.getElementById(id).value='');
+      document.getElementById('fkls-semester').value = '1';
+    }
+    populateMatkulDropdown('fkls-matkul', document.getElementById('fkls-matkul').value);
+    populateJurusanDropdown('fkls-prodi', document.getElementById('fkls-prodi').value);
+    populateDosenDropdown('fkls-dosen', document.getElementById('fkls-dosen').value);
+    document.getElementById('modal-kelas').classList.add('open');
+  }
+
+  function editKelas(k) {
+    document.getElementById('fkls-id').value       = k.id;
+    document.getElementById('fkls-nama').value     = k.nama_kelas;
+    document.getElementById('fkls-semester').value = k.semester||'1';
+    document.getElementById('fkls-jadwal').value   = k.jadwal||'';
+    populateMatkulDropdown('fkls-matkul', k.matkul_id||'');
+    populateJurusanDropdown('fkls-prodi', k.prodi||'');
+    populateDosenDropdown('fkls-dosen', k.dosen_id||'');
+    openModalKelas('edit');
+  }
+
+  function closeModalKelas() { document.getElementById('modal-kelas').classList.remove('open'); }
+
+  async function submitKelas() {
+    const id         = document.getElementById('fkls-id').value;
+    const nama_kelas = document.getElementById('fkls-nama').value.trim();
+    const matkul_id  = document.getElementById('fkls-matkul').value;
+    const semester   = document.getElementById('fkls-semester').value;
+    const prodi      = document.getElementById('fkls-prodi').value;
+    const dosen_id   = document.getElementById('fkls-dosen').value;
+    const jadwal     = document.getElementById('fkls-jadwal').value.trim();
+
+    if (!nama_kelas)  { showToast('Nama kelas wajib diisi!'); return; }
+    if (!matkul_id)   { showToast('Mata kuliah wajib dipilih!'); return; }
+    if (!prodi)       { showToast('Program studi wajib dipilih!'); return; }
+    if (!dosen_id)    { showToast('Dosen wajib dipilih!'); return; }
+    if (!semester)    { showToast('Semester wajib dipilih!'); return; }
+
+    const isEdit = !!id;
+    const body   = isEdit
+      ? { id, nama_kelas, dosen_id, jadwal, semester: parseInt(semester), prodi, key: ADMIN_KEY }
+      : { matkul_id, nama_kelas, semester: parseInt(semester), prodi, dosen_id, jadwal, key: ADMIN_KEY };
+
+    const action = isEdit ? 'update' : 'add';
+    try {
+      const res  = await fetch(`/api/kelas/${action}`, { method: 'POST', headers: adminHeaders(), body: JSON.stringify(body) });
+      const data = await res.json();
+      if (!res.ok) { showToast(data.error||'Gagal menyimpan kelas.'); return; }
+      showToast(isEdit ? 'Kelas diperbarui!' : `Kelas "${nama_kelas}" ditambahkan!`);
+      closeModalKelas();
+      await loadKelas();
+    } catch { showToast('Tidak dapat terhubung ke server.'); }
+  }
+
+  function deleteKelas(id, nama) {
+    document.getElementById('confirm-msg').textContent = `Kelas "${nama}" akan dihapus secara permanen.`;
+    document.getElementById('btn-confirm-ok').onclick = async () => {
+      closeConfirm();
+      try {
+        const res  = await fetch('/api/kelas/delete', { method: 'POST', headers: adminHeaders(), body: adminBody({ id }) });
+        const data = await res.json();
+        if (!res.ok) { showToast(data.error||'Gagal menghapus.'); return; }
+        showToast(`Kelas "${nama}" dihapus.`);
+        await loadKelas();
+      } catch { showToast('Tidak dapat terhubung ke server.'); }
+    };
     document.getElementById('modal-confirm').classList.add('open');
   }
+
+  // ─── KELOLA MAHASISWA KELAS (SET-MAHASISWA) ────────────────────────────────
+
+  let allMhsForAssign = []; // cache mahasiswa untuk modal assign
+
+  function openModalAssign(kelasId) {
+    assignKelasId = kelasId;
+    const kelas = allKelas.find(k => k.id === kelasId);
+    if (!kelas) return;
+    document.getElementById('modal-assign-title').textContent = `Mahasiswa — ${kelas.nama_kelas}`;
+    document.getElementById('assign-search').value = '';
+
+    const anggota = kelas.mahasiswa || [];
+    allMhsForAssign = allUsers.filter(u => u.role === 'mahasiswa');
+    renderMhsCheckList(allMhsForAssign, anggota);
+    document.getElementById('modal-assign-mhs').classList.add('open');
+  }
+
+  function renderMhsCheckList(list, anggota=[]) {
+    const container = document.getElementById('mhs-check-list');
+    if (!list.length) {
+      container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--gray-500);font-size:13px">Tidak ada mahasiswa terdaftar.</div>';
+      return;
+    }
+    container.innerHTML = list.map(u => {
+      const checked = anggota.includes(u.id) ? 'checked' : '';
+      return `<label class="mhs-check-item">
+        <input type="checkbox" value="${u.id}" ${checked} id="chk-${u.id}"/>
+        <div style="flex:1">
+          <div>${u.nama}</div>
+          <div class="mhs-nim">${u.nim_nip}${u.jurusan ? ' · ' + u.jurusan : ''}</div>
+        </div>
+      </label>`;
+    }).join('');
+  }
+
+  function filterAssignList(q) {
+    const search  = q.toLowerCase();
+    const kelas   = allKelas.find(k => k.id === assignKelasId);
+    const anggota = kelas ? (kelas.mahasiswa||[]) : [];
+    const filtered = allMhsForAssign.filter(u =>
+      u.nama.toLowerCase().includes(search) || u.nim_nip.toLowerCase().includes(search)
+    );
+    renderMhsCheckList(filtered, anggota);
+  }
+
+  async function submitAssignMhs() {
+    const checkboxes = document.querySelectorAll('#mhs-check-list input[type=checkbox]');
+    const mahasiswa  = Array.from(checkboxes).filter(c => c.checked).map(c => c.value);
+
+    try {
+      const res  = await fetch('/api/kelas/set-mahasiswa', {
+        method: 'POST',
+        headers: adminHeaders(),
+        body: adminBody({ kelas_id: assignKelasId, mahasiswa })
+      });
+      const data = await res.json();
+      if (!res.ok) { showToast(data.error||'Gagal menyimpan anggota kelas.'); return; }
+      showToast(`Anggota kelas berhasil diperbarui (${mahasiswa.length} mahasiswa).`);
+      closeModalAssign();
+      await loadKelas();
+    } catch { showToast('Tidak dapat terhubung ke server.'); }
+  }
+
+  function closeModalAssign() {
+    document.getElementById('modal-assign-mhs').classList.remove('open');
+    assignKelasId = null;
+  }
+
+  // ─── CONFIRM / SHARED ─────────────────────────────────────────────────────
+
   function closeConfirm() { document.getElementById('modal-confirm').classList.remove('open'); }
 
   function showPage(id) {
