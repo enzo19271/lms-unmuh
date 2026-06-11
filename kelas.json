@@ -51,8 +51,14 @@
       "prodi": "Pendidikan Jasmani Kesehatan dan Rekreasi",
       "dosen_id": "usr_1781089978920",
       "jadwal": "",
-      "mahasiswa": [],
-      "created_at": "2026-06-11T10:28:44.919Z"
+      "mahasiswa": [
+        "usr_1781631463846",
+        "usr_1781793388953",
+        "usr_1781166073720",
+        "usr_1781173285807"
+      ],
+      "created_at": "2026-06-11T10:28:44.919Z",
+      "updated_at": "2026-06-11T10:28:55.582Z"
     }
   ]
 }
