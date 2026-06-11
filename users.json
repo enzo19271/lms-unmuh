@@ -22,16 +22,6 @@
       "updated_at": "2026-06-10T05:34:15.601Z"
     },
     {
-      "id": "usr_1781006438509",
-      "nim_nip": "250241114",
-      "nama": "Enzo Fahrezi",
-      "password": "40f5c59710b8aab13d350f280c7c215a92cd8d7d5e4ad2cea2b296e197befb44",
-      "role": "mahasiswa",
-      "created_at": "2026-06-09T12:00:38.509Z",
-      "jurusan": "Pendidikan Jasmani Kesehatan dan Rekreasi",
-      "semester": 2
-    },
-    {
       "id": "usr_1781045446222",
       "nim_nip": "1207066",
       "nama": "Senzo, M. Pd.",
