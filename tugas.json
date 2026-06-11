@@ -127,6 +127,18 @@
       "status": "aktif",
       "pengumpulan": [],
       "created_at": "2026-06-11T11:46:47.467Z"
+    },
+    {
+      "id": "tgs_1781178515424",
+      "judul": "Tugas 4 - Buatkan laporan hasil observasi",
+      "deskripsi": "Laporan diketik dan dijilid dalam kertas A4 maksimal 10 halaman",
+      "kelas_id": "kls_1781165925917",
+      "matkul_id": "mk_1781006313065",
+      "deadline": "2026-06-21T18:48",
+      "dosen_id": "usr_1781166257496",
+      "status": "aktif",
+      "pengumpulan": [],
+      "created_at": "2026-06-11T11:48:35.424Z"
     }
   ]
 }
