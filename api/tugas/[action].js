@@ -1,19 +1,28 @@
 // api/tugas/[action].js
 // CRUD Tugas — disimpan di tugas.json via GitHub API
-// Actions: list, add, update, delete, kumpul, edit-kumpulan, list-pengumpulan
-// list              → semua (filter by dosen_id atau matkul)
-// add               → dosen only
-// update            → dosen only
-// delete            → dosen only
-// kumpul            → mahasiswa only (submit / edit pengumpulan tugas)
-// edit-kumpulan     → mahasiswa only (edit kiriman yang sudah ada)
-// list-pengumpulan  → dosen only (lihat semua kiriman mahasiswa per tugas)
+//
+// Actions:
+//   list              → dosen/mahasiswa: list tugas (filter by kelas_id / dosen_id)
+//   add               → dosen only: buat tugas baru (wajib pilih kelas_id)
+//   update            → dosen only: edit tugas miliknya
+//   delete            → dosen only: hapus tugas miliknya
+//   kumpul            → mahasiswa only: kumpulkan tugas
+//   edit-kumpulan     → mahasiswa only: edit kiriman yang sudah ada
+//   list-pengumpulan  → dosen only: lihat semua kiriman mahasiswa per tugas
+//
+// PERUBAHAN v2 (kelas):
+//   - Field kelas_id wajib saat add
+//   - handleList: mahasiswa → filter tugas by kelas_ids miliknya (via kelas.json)
+//   - handleList: dosen     → filter by kelas_id atau dosen_id
+//   - handleKumpul: cek mahasiswa terdaftar di kelas tugas tersebut
+//   - Data tugas lama (tanpa kelas_id) tetap tampil sebagai legacy
 
 import { webcrypto } from 'crypto';
 import { Buffer } from 'buffer';
 
-const crypto = webcrypto;
-const FILE   = 'tugas.json';
+const crypto   = webcrypto;
+const FILE     = 'tugas.json';
+const FILE_KELAS = 'kelas.json';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin',  '*');
@@ -42,11 +51,11 @@ export default async function handler(req, res) {
 
 // ─── GITHUB HELPERS ──────────────────────────────────────────────────────────
 
-function getGHConfig() {
+function getGHConfig(file) {
   const { GITHUB_OWNER, GITHUB_REPO, GITHUB_PAT } = process.env;
   if (!GITHUB_OWNER || !GITHUB_REPO || !GITHUB_PAT) return null;
   return {
-    url: `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${FILE}`,
+    url: `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${file}`,
     headers: {
       Authorization:          `Bearer ${GITHUB_PAT}`,
       Accept:                 'application/vnd.github+json',
@@ -57,7 +66,7 @@ function getGHConfig() {
 }
 
 async function getData() {
-  const gh = getGHConfig();
+  const gh = getGHConfig(FILE);
   if (!gh) throw new Error('ENV_MISSING');
   const r = await fetch(gh.url, { headers: gh.headers });
   if (!r.ok) throw new Error(`GitHub GET error: ${r.status}`);
@@ -67,7 +76,7 @@ async function getData() {
 }
 
 async function saveData(data, sha) {
-  const gh = getGHConfig();
+  const gh = getGHConfig(FILE);
   if (!gh) throw new Error('ENV_MISSING');
   const content = Buffer.from(JSON.stringify(data, null, 2), 'utf-8').toString('base64');
   const r = await fetch(gh.url, {
@@ -77,6 +86,18 @@ async function saveData(data, sha) {
   });
   if (!r.ok) throw new Error(`GitHub PUT error ${r.status}: ${await r.text()}`);
   return true;
+}
+
+// Ambil kelas.json — untuk keperluan filter & validasi
+async function getKelasData() {
+  const gh = getGHConfig(FILE_KELAS);
+  if (!gh) throw new Error('ENV_MISSING');
+  const r = await fetch(gh.url, { headers: gh.headers });
+  if (r.status === 404) return { kelas: [] };   // file belum ada → kosong
+  if (!r.ok) throw new Error(`GitHub GET kelas error: ${r.status}`);
+  const j = await r.json();
+  const decoded = Buffer.from(j.content, 'base64').toString('utf-8');
+  return JSON.parse(decoded);
 }
 
 // ─── TOKEN VERIFY ─────────────────────────────────────────────────────────────
@@ -132,47 +153,92 @@ async function requireMahasiswa(req, res) {
 }
 
 // ─── LIST ─────────────────────────────────────────────────────────────────────
-// GET /api/tugas/list?dosen_id=&matkul=
-// Untuk mahasiswa: tidak menampilkan detail pengumpulan mahasiswa lain,
-// tapi menyisipkan field "pengumpulan_saya" khusus untuk mahasiswa yg request.
+// GET /api/tugas/list?kelas_id=&dosen_id=
+//
+// Mahasiswa:
+//   - Ambil kelas_ids mahasiswa dari kelas.json
+//   - Filter tugas yang kelas_id-nya ada di kelas_ids mahasiswa
+//   - Tugas legacy (tanpa kelas_id) tetap tampil jika dosen_id cocok (backward compat)
+//   - Sisipkan pengumpulan_saya di tiap tugas
+//
+// Dosen:
+//   - Filter by kelas_id (opsional) atau dosen_id (default: dosen sendiri)
+//   - Jika ?kelas_id= → hanya tugas kelas itu
+//
+// Admin / query langsung: bisa kirim ?dosen_id= dan/atau ?kelas_id=
 
 async function handleList(req, res) {
-  let result;
-  try { result = await getData(); }
+  const token   = req.headers['x-session-token'];
+  let session   = null;
+  if (token) session = await verifyToken(token);
+
+  if (!session) {
+    return res.status(401).json({ error: 'Token diperlukan.' });
+  }
+
+  let tugasResult;
+  try { tugasResult = await getData(); }
   catch (e) {
     return res.status(500).json({
       error: e.message === 'ENV_MISSING' ? 'Konfigurasi server belum diatur.' : 'Gagal membaca data tugas.'
     });
   }
 
-  let list              = result.data.tugas || [];
-  const { dosen_id, matkul } = req.query;
-  if (dosen_id) list    = list.filter(t => t.dosen_id === dosen_id);
-  if (matkul)   list    = list.filter(t => t.matkul   === matkul);
+  let list = tugasResult.data.tugas || [];
+  const { kelas_id, dosen_id } = req.query;
 
-  // Jika ada token mahasiswa → sisipkan pengumpulan_saya di tiap tugas
-  const token   = req.headers['x-session-token'];
-  let session   = null;
-  if (token) session = await verifyToken(token);
+  if (session.role === 'mahasiswa') {
+    // Ambil kelas mahasiswa ini
+    let kelasData;
+    try { kelasData = await getKelasData(); } catch { kelasData = { kelas: [] }; }
 
-  const isMhs = session?.role === 'mahasiswa';
+    const kelasSaya = (kelasData.kelas || [])
+      .filter(k => (k.mahasiswa || []).includes(session.id))
+      .map(k => k.id);
+
+    // Filter: tugas harus punya kelas_id yang ada di kelasSaya,
+    // ATAU tugas legacy (tanpa kelas_id) yang dosen_id-nya mengajar kelas mahasiswa ini
+    const dosenKelasSaya = (kelasData.kelas || [])
+      .filter(k => (k.mahasiswa || []).includes(session.id))
+      .map(k => k.dosen_id);
+
+    list = list.filter(t => {
+      if (t.kelas_id) return kelasSaya.includes(t.kelas_id);
+      // Legacy: tidak ada kelas_id → tampilkan jika dosen pengajar kelas mahasiswa ini
+      return dosenKelasSaya.includes(t.dosen_id);
+    });
+
+    // Filter tambahan jika ada query kelas_id
+    if (kelas_id) list = list.filter(t => t.kelas_id === kelas_id);
+
+  } else if (session.role === 'dosen') {
+    // Dosen: default tampilkan tugas miliknya sendiri
+    list = list.filter(t => t.dosen_id === session.id);
+    if (kelas_id) list = list.filter(t => t.kelas_id === kelas_id);
+
+  } else {
+    // Admin / fallback
+    if (dosen_id) list = list.filter(t => t.dosen_id === dosen_id);
+    if (kelas_id) list = list.filter(t => t.kelas_id === kelas_id);
+  }
+
+  const isMhs = session.role === 'mahasiswa';
 
   const sanitized = list.map(t => {
     const base = {
-      id:         t.id,
-      judul:      t.judul,
-      deskripsi:  t.deskripsi || '',
-      matkul:     t.matkul,
-      deadline:   t.deadline,
-      dosen_id:   t.dosen_id,
-      status:     t.status,
-      created_at: t.created_at,
-      updated_at: t.updated_at,
-      // jumlah pengumpulan (info umum)
+      id:            t.id,
+      judul:         t.judul,
+      deskripsi:     t.deskripsi || '',
+      matkul:        t.matkul    || '',
+      kelas_id:      t.kelas_id  || null,   // null = data legacy
+      deadline:      t.deadline,
+      dosen_id:      t.dosen_id,
+      status:        t.status,
+      created_at:    t.created_at,
+      updated_at:    t.updated_at,
       jumlah_kumpul: (t.pengumpulan || []).length,
     };
     if (isMhs) {
-      // Hanya kiriman milik mahasiswa ini
       const milik = (t.pengumpulan || []).find(p => p.mhs_id === session.id);
       base.pengumpulan_saya = milik || null;
     }
@@ -183,61 +249,100 @@ async function handleList(req, res) {
 }
 
 // ─── ADD ──────────────────────────────────────────────────────────────────────
+// POST /api/tugas/add
+// Body: { judul, deskripsi?, kelas_id, deadline }
+//
+// kelas_id wajib. matkul_id / nama matkul di-resolve dari kelas.json secara otomatis
+// sehingga tidak perlu dikirim manual oleh frontend.
 
 async function handleAdd(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Gunakan POST.' });
   const session = await requireDosen(req, res);
   if (!session) return;
 
-  const { judul, deskripsi, matkul, deadline } = req.body || {};
-  if (!judul || !matkul || !deadline)
-    return res.status(400).json({ error: 'judul, matkul, dan deadline diperlukan.' });
+  const { judul, deskripsi, kelas_id, deadline } = req.body || {};
+
+  if (!judul || !kelas_id || !deadline)
+    return res.status(400).json({ error: 'judul, kelas_id, dan deadline diperlukan.' });
+
+  // Validasi: kelas_id harus ada dan diajar oleh dosen ini
+  let kelasData;
+  try { kelasData = await getKelasData(); }
+  catch (e) { return res.status(500).json({ error: 'Gagal membaca data kelas.' }); }
+
+  const kelas = (kelasData.kelas || []).find(k => k.id === kelas_id);
+  if (!kelas)
+    return res.status(404).json({ error: 'Kelas tidak ditemukan.' });
+  if (kelas.dosen_id !== session.id)
+    return res.status(403).json({ error: 'Anda tidak mengajar kelas ini.' });
 
   let result;
-  try { result = await getData(); } catch (e) { return res.status(500).json({ error: 'Gagal membaca data.' }); }
+  try { result = await getData(); }
+  catch (e) { return res.status(500).json({ error: 'Gagal membaca data tugas.' }); }
 
   const { data, sha } = result;
   const newTugas = {
-    id:           `tgs_${Date.now()}`,
-    judul:        judul.trim(),
-    deskripsi:    (deskripsi || '').trim(),
-    matkul:       matkul.trim(),
+    id:          `tgs_${Date.now()}`,
+    judul:       judul.trim(),
+    deskripsi:   (deskripsi || '').trim(),
+    kelas_id:    kelas_id.trim(),
+    matkul_id:   kelas.matkul_id,   // disimpan untuk referensi
     deadline,
-    dosen_id:     session.id,
-    status:       'aktif',
-    pengumpulan:  [],   // ← array pengumpulan mahasiswa
-    created_at:   new Date().toISOString(),
+    dosen_id:    session.id,
+    status:      'aktif',
+    pengumpulan: [],
+    created_at:  new Date().toISOString(),
   };
+
   (data.tugas = data.tugas || []).push(newTugas);
 
   try { await saveData(data, sha); }
   catch (e) { return res.status(500).json({ error: 'Gagal menyimpan.' }); }
 
-  return res.status(200).json({ message: `Tugas "${judul}" berhasil ditambahkan.`, tugas: newTugas });
+  return res.status(200).json({
+    message: `Tugas "${judul}" berhasil ditambahkan.`,
+    tugas: newTugas,
+  });
 }
 
 // ─── UPDATE ───────────────────────────────────────────────────────────────────
+// POST /api/tugas/update
+// Body: { id, judul?, deskripsi?, deadline?, status?, kelas_id? }
 
 async function handleUpdate(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Gunakan POST.' });
   const session = await requireDosen(req, res);
   if (!session) return;
 
-  const { id, judul, deskripsi, matkul, deadline, status } = req.body || {};
+  const { id, judul, deskripsi, deadline, status, kelas_id } = req.body || {};
   if (!id) return res.status(400).json({ error: 'id tugas diperlukan.' });
 
+  // Jika dosen ingin pindah kelas_id → validasi dulu
+  if (kelas_id) {
+    let kelasData;
+    try { kelasData = await getKelasData(); }
+    catch (e) { return res.status(500).json({ error: 'Gagal membaca data kelas.' }); }
+
+    const kelas = (kelasData.kelas || []).find(k => k.id === kelas_id);
+    if (!kelas)
+      return res.status(404).json({ error: 'Kelas tidak ditemukan.' });
+    if (kelas.dosen_id !== session.id)
+      return res.status(403).json({ error: 'Anda tidak mengajar kelas ini.' });
+  }
+
   let result;
-  try { result = await getData(); } catch (e) { return res.status(500).json({ error: 'Gagal membaca data.' }); }
+  try { result = await getData(); }
+  catch (e) { return res.status(500).json({ error: 'Gagal membaca data.' }); }
 
   const { data, sha } = result;
   const idx = (data.tugas || []).findIndex(t => t.id === id && t.dosen_id === session.id);
   if (idx === -1)
     return res.status(404).json({ error: 'Tugas tidak ditemukan atau bukan milik Anda.' });
 
-  if (judul)                   data.tugas[idx].judul    = judul.trim();
+  if (judul)                   data.tugas[idx].judul     = judul.trim();
   if (deskripsi !== undefined) data.tugas[idx].deskripsi = deskripsi.trim();
-  if (matkul)                  data.tugas[idx].matkul   = matkul.trim();
-  if (deadline)                data.tugas[idx].deadline = deadline;
+  if (deadline)                data.tugas[idx].deadline  = deadline;
+  if (kelas_id)                data.tugas[idx].kelas_id  = kelas_id.trim();
   if (status && ['aktif', 'ditutup', 'selesai'].includes(status))
     data.tugas[idx].status = status;
   data.tugas[idx].updated_at = new Date().toISOString();
@@ -259,7 +364,8 @@ async function handleDelete(req, res) {
   if (!id) return res.status(400).json({ error: 'id tugas diperlukan.' });
 
   let result;
-  try { result = await getData(); } catch (e) { return res.status(500).json({ error: 'Gagal membaca data.' }); }
+  try { result = await getData(); }
+  catch (e) { return res.status(500).json({ error: 'Gagal membaca data.' }); }
 
   const { data, sha } = result;
   const before  = (data.tugas || []).length;
@@ -276,7 +382,7 @@ async function handleDelete(req, res) {
 // ─── KUMPUL ───────────────────────────────────────────────────────────────────
 // POST /api/tugas/kumpul
 // Body: { tugas_id, link, catatan, nama, nim }
-// Mahasiswa mengumpulkan tugas. Jika sudah pernah kumpul → ditolak (pakai edit-kumpulan).
+// Mahasiswa kumpulkan tugas. Validasi: mahasiswa harus terdaftar di kelas tugas tsb.
 
 async function handleKumpul(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Gunakan POST.' });
@@ -290,7 +396,8 @@ async function handleKumpul(req, res) {
     return res.status(400).json({ error: 'Isi minimal link file atau catatan pengumpulan.' });
 
   let result;
-  try { result = await getData(); } catch (e) { return res.status(500).json({ error: 'Gagal membaca data.' }); }
+  try { result = await getData(); }
+  catch (e) { return res.status(500).json({ error: 'Gagal membaca data.' }); }
 
   const { data, sha } = result;
   const idx = (data.tugas || []).findIndex(t => t.id === tugas_id);
@@ -299,11 +406,20 @@ async function handleKumpul(req, res) {
 
   const tugas = data.tugas[idx];
 
-  // Cek apakah tugas masih aktif
   if (tugas.status !== 'aktif')
     return res.status(400).json({ error: 'Tugas ini sudah ditutup, tidak bisa dikumpulkan.' });
 
-  // Cek apakah sudah pernah mengumpulkan
+  // Validasi kelas: jika tugas punya kelas_id, mahasiswa harus terdaftar di kelas itu
+  if (tugas.kelas_id) {
+    let kelasData;
+    try { kelasData = await getKelasData(); } catch { kelasData = { kelas: [] }; }
+
+    const kelas = (kelasData.kelas || []).find(k => k.id === tugas.kelas_id);
+    if (kelas && !(kelas.mahasiswa || []).includes(session.id)) {
+      return res.status(403).json({ error: 'Anda tidak terdaftar di kelas tugas ini.' });
+    }
+  }
+
   if (!tugas.pengumpulan) tugas.pengumpulan = [];
   const sudahKumpul = tugas.pengumpulan.find(p => p.mhs_id === session.id);
   if (sudahKumpul)
@@ -328,7 +444,6 @@ async function handleKumpul(req, res) {
 // ─── EDIT KUMPULAN ────────────────────────────────────────────────────────────
 // POST /api/tugas/edit-kumpulan
 // Body: { tugas_id, link, catatan }
-// Mahasiswa mengedit kiriman yang sudah ada.
 
 async function handleEditKumpulan(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Gunakan POST.' });
@@ -338,11 +453,12 @@ async function handleEditKumpulan(req, res) {
   const { tugas_id, link, catatan } = req.body || {};
   if (!tugas_id)
     return res.status(400).json({ error: 'tugas_id diperlukan.' });
-  if (!link && !catatan)
+  if (link === undefined && catatan === undefined)
     return res.status(400).json({ error: 'Isi minimal link file atau catatan.' });
 
   let result;
-  try { result = await getData(); } catch (e) { return res.status(500).json({ error: 'Gagal membaca data.' }); }
+  try { result = await getData(); }
+  catch (e) { return res.status(500).json({ error: 'Gagal membaca data.' }); }
 
   const { data, sha } = result;
   const idx = (data.tugas || []).findIndex(t => t.id === tugas_id);
@@ -370,7 +486,7 @@ async function handleEditKumpulan(req, res) {
 
 // ─── LIST PENGUMPULAN (DOSEN) ─────────────────────────────────────────────────
 // GET /api/tugas/list-pengumpulan?tugas_id=
-// Dosen melihat semua kiriman mahasiswa untuk satu tugas.
+// Dosen melihat semua kiriman mahasiswa untuk satu tugas miliknya.
 
 async function handleListPengumpulan(req, res) {
   const session = await requireDosen(req, res);
@@ -381,23 +497,24 @@ async function handleListPengumpulan(req, res) {
     return res.status(400).json({ error: 'tugas_id diperlukan.' });
 
   let result;
-  try { result = await getData(); } catch (e) { return res.status(500).json({ error: 'Gagal membaca data.' }); }
+  try { result = await getData(); }
+  catch (e) { return res.status(500).json({ error: 'Gagal membaca data.' }); }
 
   const tugas = (result.data.tugas || []).find(t => t.id === tugas_id);
   if (!tugas)
     return res.status(404).json({ error: 'Tugas tidak ditemukan.' });
 
-  // Pastikan hanya dosen pemilik tugas yang bisa akses
   if (tugas.dosen_id !== session.id)
     return res.status(403).json({ error: 'Anda bukan pemilik tugas ini.' });
 
   return res.status(200).json({
-    tugas_id:     tugas.id,
-    judul:        tugas.judul,
-    matkul:       tugas.matkul,
-    deadline:     tugas.deadline,
-    status:       tugas.status,
-    pengumpulan:  tugas.pengumpulan || [],
-    total:        (tugas.pengumpulan || []).length,
+    tugas_id:    tugas.id,
+    judul:       tugas.judul,
+    kelas_id:    tugas.kelas_id  || null,
+    matkul_id:   tugas.matkul_id || null,
+    deadline:    tugas.deadline,
+    status:      tugas.status,
+    pengumpulan: tugas.pengumpulan || [],
+    total:       (tugas.pengumpulan || []).length,
   });
 }
