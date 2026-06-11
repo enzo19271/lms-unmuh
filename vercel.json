@@ -6,6 +6,7 @@
     { "source": "/api/matkul/:action",   "destination": "/api/matkul/[action]" },
     { "source": "/api/tugas/:action",    "destination": "/api/tugas/[action]" },
     { "source": "/api/absensi/:action",  "destination": "/api/absensi/[action]" },
-    { "source": "/api/diskusi/:action",  "destination": "/api/diskusi/[action]" }
+    { "source": "/api/diskusi/:action",  "destination": "/api/diskusi/[action]" },
+    { "source": "/api/kelas/:action",   "destination": "/api/kelas/[action]" }
   ]
 }
