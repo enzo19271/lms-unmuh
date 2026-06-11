@@ -1242,6 +1242,16 @@
       "dosen_id": null,
       "dosen_nama": "Gilang Pratama, M. Pd.",
       "created_at": "2026-06-10T05:23:04.562667Z"
+    },
+    {
+      "id": "mk_1781166208742",
+      "nama": "Senam",
+      "kode": "PJKR25003",
+      "jurusan": "Pendidikan Jasmani Kesehatan dan Rekreasi",
+      "sks": 2,
+      "dosen_id": null,
+      "dosen_nama": "Randi Putra, M. Pd.",
+      "created_at": "2026-06-11T08:23:28.742Z"
     }
   ]
 }
