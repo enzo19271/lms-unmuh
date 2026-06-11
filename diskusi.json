@@ -166,6 +166,17 @@
         "isi": "Hai anak anak",
         "created_at": "2026-06-11T10:30:38.697Z",
         "dihapus": false
+      },
+      {
+        "id": "msg_1781178306100_cpdib",
+        "sender_id": "usr_1781166073720",
+        "sender_nim": "250241114",
+        "sender_nama": "Enzo Fachrezie",
+        "role": "mahasiswa",
+        "kelas_id": "kls_1781165925917",
+        "isi": "izin bertanya pak",
+        "created_at": "2026-06-11T11:45:06.100Z",
+        "dihapus": false
       }
     ],
     "kelas_kls_1781165979185": [
