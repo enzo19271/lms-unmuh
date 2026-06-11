@@ -1,8 +1,15 @@
 // api/auth/[action].js
 // Sistem autentikasi LMS
-// Actions: login, verify, register, list-users, delete-user, update-user
+// Actions: login, verify, register, list-users, delete-user, update-user,
+//          change-password, list-mahasiswa
 // Storage: GitHub API (users.json)
 // Roles: mahasiswa, dosen, admin
+//
+// PERUBAHAN v2 (kelas):
+//   - safeUser menyertakan kelas_ids (untuk mahasiswa)
+//   - register: simpan kelas_ids jika dikirim
+//   - update-user: bisa update kelas_ids mahasiswa
+//   - list-mahasiswa: sertakan kelas_ids di response
 
 import { webcrypto } from 'crypto';
 import { Buffer } from 'buffer';
@@ -21,14 +28,14 @@ export default async function handler(req, res) {
 
   try {
     switch (action) {
-      case 'login':         return await handleLogin(req, res);
-      case 'verify':        return await handleVerify(req, res);
-      case 'register':      return await handleRegister(req, res);
-      case 'list-users':    return await handleListUsers(req, res);
-      case 'delete-user':   return await handleDeleteUser(req, res);
-      case 'update-user':   return await handleUpdateUser(req, res);
-      case 'change-password':   return await handleChangePassword(req, res);
-      case 'list-mahasiswa':    return await handleListMahasiswa(req, res);
+      case 'login':            return await handleLogin(req, res);
+      case 'verify':           return await handleVerify(req, res);
+      case 'register':         return await handleRegister(req, res);
+      case 'list-users':       return await handleListUsers(req, res);
+      case 'delete-user':      return await handleDeleteUser(req, res);
+      case 'update-user':      return await handleUpdateUser(req, res);
+      case 'change-password':  return await handleChangePassword(req, res);
+      case 'list-mahasiswa':   return await handleListMahasiswa(req, res);
       default:
         return res.status(404).json({ error: `Action tidak dikenal: ${action}` });
     }
@@ -108,14 +115,12 @@ async function verifyToken(token) {
     const parts = decoded.split('|');
     if (parts.length < 5) return null;
 
-    const sigHex = parts[parts.length - 1];
+    const sigHex  = parts[parts.length - 1];
     const payload = parts.slice(0, parts.length - 1).join('|');
     const [nim_nip, role, id, tsStr] = parts;
 
     const ts = parseInt(tsStr);
     if (isNaN(ts)) return null;
-
-    // Token berlaku 24 jam
     if (Date.now() - ts > 24 * 60 * 60 * 1000) return null;
 
     const encoder = new TextEncoder();
@@ -147,7 +152,7 @@ function checkAdmin(req, res) {
   return true;
 }
 
-// ─── SIMPLE PASSWORD HASH (SHA-256) ───────────────────────────────────────────
+// ─── PASSWORD HASH ────────────────────────────────────────────────────────────
 
 async function hashPassword(password) {
   const encoder = new TextEncoder();
@@ -156,20 +161,35 @@ async function hashPassword(password) {
   return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+// ─── SAFE USER HELPER ─────────────────────────────────────────────────────────
+// Normalkan field user yang aman dikembalikan ke frontend (tanpa password)
+
+function toSafeUser(user) {
+  return {
+    id:         user.id,
+    nim_nip:    user.nim_nip,
+    nama:       user.nama,
+    role:       user.role,
+    jurusan:    user.jurusan    || null,
+    semester:   user.semester   || null,
+    mata_kuliah:user.mata_kuliah|| null,
+    // v2: kelas_ids untuk mahasiswa
+    kelas_ids:  user.role === 'mahasiswa' ? (user.kelas_ids || []) : undefined,
+  };
+}
+
 // ─── LOGIN ────────────────────────────────────────────────────────────────────
 
 async function handleLogin(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Gunakan POST.' });
 
   const { nim_nip, password } = req.body || {};
-  if (!nim_nip || !password) {
+  if (!nim_nip || !password)
     return res.status(400).json({ error: 'NIM/NIP dan password diperlukan.' });
-  }
 
   let result;
-  try {
-    result = await getUsers();
-  } catch (e) {
+  try { result = await getUsers(); }
+  catch (e) {
     const msg = e.message === 'ENV_MISSING'
       ? 'Konfigurasi server belum diatur.'
       : 'Gagal membaca data pengguna.';
@@ -177,43 +197,26 @@ async function handleLogin(req, res) {
   }
 
   const users = result.data.users || [];
-  const user = users.find(u => u.nim_nip === nim_nip.trim());
-
-  if (!user) {
+  const user  = users.find(u => u.nim_nip === nim_nip.trim());
+  if (!user)
     return res.status(401).json({ error: 'NIM/NIP tidak ditemukan.' });
-  }
 
-  // Cek password — support plain text (legacy) dan hashed
-  let passwordValid = false;
-  if (user.password === password) {
-    // Plain text (akun lama / seed data)
-    passwordValid = true;
-  } else {
+  // Support plain text (legacy) dan hashed
+  let passwordValid = user.password === password;
+  if (!passwordValid) {
     const hashed = await hashPassword(password);
     if (user.password === hashed) passwordValid = true;
   }
 
-  if (!passwordValid) {
+  if (!passwordValid)
     return res.status(401).json({ error: 'Password salah.' });
-  }
 
   const token = await makeToken(user);
-
-  // Data user yang aman dikembalikan ke frontend (tanpa password)
-  const safeUser = {
-    id: user.id,
-    nim_nip: user.nim_nip,
-    nama: user.nama,
-    role: user.role,
-    jurusan: user.jurusan || null,
-    semester: user.semester || null,
-    mata_kuliah: user.mata_kuliah || null,
-  };
 
   return res.status(200).json({
     message: 'Login berhasil.',
     token,
-    user: safeUser,
+    user: toSafeUser(user),
   });
 }
 
@@ -226,25 +229,13 @@ async function handleVerify(req, res) {
   const session = await verifyToken(token);
   if (!session) return res.status(401).json({ valid: false, error: 'Sesi tidak valid atau sudah berakhir.' });
 
-  // Ambil data user terbaru dari GitHub
   try {
     const result = await getUsers();
-    const user = (result.data.users || []).find(u => u.id === session.id);
+    const user   = (result.data.users || []).find(u => u.id === session.id);
     if (!user) return res.status(401).json({ valid: false, error: 'Akun tidak ditemukan.' });
 
-    const safeUser = {
-      id: user.id,
-      nim_nip: user.nim_nip,
-      nama: user.nama,
-      role: user.role,
-      jurusan: user.jurusan || null,
-      semester: user.semester || null,
-      mata_kuliah: user.mata_kuliah || null,
-    };
-
-    return res.status(200).json({ valid: true, user: safeUser });
+    return res.status(200).json({ valid: true, user: toSafeUser(user) });
   } catch {
-    // Jika GitHub gagal, kembalikan dari token saja
     return res.status(200).json({ valid: true, user: session });
   }
 }
@@ -255,56 +246,52 @@ async function handleRegister(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Gunakan POST.' });
   if (!checkAdmin(req, res)) return;
 
-  const { nim_nip, nama, password, role, jurusan, semester, mata_kuliah } = req.body || {};
+  const { nim_nip, nama, password, role, jurusan, semester, mata_kuliah, kelas_ids } = req.body || {};
 
-  if (!nim_nip || !nama || !password || !role) {
+  if (!nim_nip || !nama || !password || !role)
     return res.status(400).json({ error: 'nim_nip, nama, password, dan role diperlukan.' });
-  }
-  if (!['mahasiswa', 'dosen', 'admin'].includes(role)) {
+  if (!['mahasiswa', 'dosen', 'admin'].includes(role))
     return res.status(400).json({ error: 'Role tidak valid.' });
-  }
 
   let result;
-  try {
-    result = await getUsers();
-  } catch (e) {
-    return res.status(500).json({ error: 'Gagal membaca data pengguna.' });
-  }
+  try { result = await getUsers(); }
+  catch (e) { return res.status(500).json({ error: 'Gagal membaca data pengguna.' }); }
 
   const { data, sha } = result;
   const users = data.users || [];
 
-  if (users.find(u => u.nim_nip === nim_nip.trim())) {
+  if (users.find(u => u.nim_nip === nim_nip.trim()))
     return res.status(409).json({ error: 'NIM/NIP sudah terdaftar.' });
-  }
 
   const hashedPassword = await hashPassword(password);
 
   const newUser = {
-    id: `usr_${Date.now()}`,
-    nim_nip: nim_nip.trim(),
-    nama: nama.trim(),
-    password: hashedPassword,
+    id:         `usr_${Date.now()}`,
+    nim_nip:    nim_nip.trim(),
+    nama:       nama.trim(),
+    password:   hashedPassword,
     role,
     created_at: new Date().toISOString(),
   };
 
-  if (jurusan) newUser.jurusan = jurusan;
-  if (role === 'mahasiswa' && semester) newUser.semester = parseInt(semester);
-  if (role === 'dosen' && mata_kuliah) newUser.mata_kuliah = Array.isArray(mata_kuliah) ? mata_kuliah : [mata_kuliah];
+  if (jurusan)     newUser.jurusan    = jurusan;
+  if (role === 'mahasiswa') {
+    if (semester)  newUser.semester   = parseInt(semester);
+    // v2: kelas_ids
+    newUser.kelas_ids = Array.isArray(kelas_ids) ? kelas_ids : [];
+  }
+  if (role === 'dosen' && mata_kuliah)
+    newUser.mata_kuliah = Array.isArray(mata_kuliah) ? mata_kuliah : [mata_kuliah];
 
   users.push(newUser);
   data.users = users;
 
-  try {
-    await saveUsers(data, sha);
-  } catch (e) {
-    return res.status(500).json({ error: 'Gagal menyimpan data pengguna.' });
-  }
+  try { await saveUsers(data, sha); }
+  catch (e) { return res.status(500).json({ error: 'Gagal menyimpan data pengguna.' }); }
 
   return res.status(200).json({
     message: `Pengguna ${nama} (${role}) berhasil ditambahkan.`,
-    user: { ...newUser, password: undefined }
+    user: toSafeUser(newUser),
   });
 }
 
@@ -314,13 +301,10 @@ async function handleListUsers(req, res) {
   if (!checkAdmin(req, res)) return;
 
   let result;
-  try {
-    result = await getUsers();
-  } catch (e) {
-    return res.status(500).json({ error: 'Gagal membaca data pengguna.' });
-  }
+  try { result = await getUsers(); }
+  catch (e) { return res.status(500).json({ error: 'Gagal membaca data pengguna.' }); }
 
-  const users = (result.data.users || []).map(u => ({ ...u, password: undefined }));
+  const users = (result.data.users || []).map(u => ({ ...toSafeUser(u) }));
   return res.status(200).json({ users });
 }
 
@@ -334,25 +318,18 @@ async function handleDeleteUser(req, res) {
   if (!id) return res.status(400).json({ error: 'id user diperlukan.' });
 
   let result;
-  try {
-    result = await getUsers();
-  } catch (e) {
-    return res.status(500).json({ error: 'Gagal membaca data pengguna.' });
-  }
+  try { result = await getUsers(); }
+  catch (e) { return res.status(500).json({ error: 'Gagal membaca data pengguna.' }); }
 
   const { data, sha } = result;
-  const before = (data.users || []).length;
-  data.users = (data.users || []).filter(u => u.id !== id);
+  const before  = (data.users || []).length;
+  data.users    = (data.users || []).filter(u => u.id !== id);
 
-  if (data.users.length === before) {
+  if (data.users.length === before)
     return res.status(404).json({ error: 'User tidak ditemukan.' });
-  }
 
-  try {
-    await saveUsers(data, sha);
-  } catch (e) {
-    return res.status(500).json({ error: 'Gagal menyimpan.' });
-  }
+  try { await saveUsers(data, sha); }
+  catch (e) { return res.status(500).json({ error: 'Gagal menyimpan.' }); }
 
   return res.status(200).json({ message: 'Pengguna berhasil dihapus.' });
 }
@@ -363,32 +340,32 @@ async function handleUpdateUser(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Gunakan POST.' });
   if (!checkAdmin(req, res)) return;
 
-  const { id, nama, role, jurusan, semester, mata_kuliah } = req.body || {};
+  const { id, nama, role, jurusan, semester, mata_kuliah, kelas_ids } = req.body || {};
   if (!id) return res.status(400).json({ error: 'id user diperlukan.' });
 
   let result;
-  try {
-    result = await getUsers();
-  } catch (e) {
-    return res.status(500).json({ error: 'Gagal membaca data pengguna.' });
-  }
+  try { result = await getUsers(); }
+  catch (e) { return res.status(500).json({ error: 'Gagal membaca data pengguna.' }); }
 
   const { data, sha } = result;
   const idx = (data.users || []).findIndex(u => u.id === id);
   if (idx === -1) return res.status(404).json({ error: 'User tidak ditemukan.' });
 
-  if (nama) data.users[idx].nama = nama.trim();
-  if (role && ['mahasiswa', 'dosen', 'admin'].includes(role)) data.users[idx].role = role;
+  if (nama)    data.users[idx].nama    = nama.trim();
+  if (role && ['mahasiswa', 'dosen', 'admin'].includes(role))
+    data.users[idx].role = role;
   if (jurusan) data.users[idx].jurusan = jurusan;
-  if (semester) data.users[idx].semester = parseInt(semester);
-  if (mata_kuliah) data.users[idx].mata_kuliah = Array.isArray(mata_kuliah) ? mata_kuliah : [mata_kuliah];
+  if (semester)data.users[idx].semester= parseInt(semester);
+  if (mata_kuliah)
+    data.users[idx].mata_kuliah = Array.isArray(mata_kuliah) ? mata_kuliah : [mata_kuliah];
+  // v2: update kelas_ids mahasiswa
+  if (kelas_ids !== undefined && data.users[idx].role === 'mahasiswa')
+    data.users[idx].kelas_ids = Array.isArray(kelas_ids) ? kelas_ids : [];
+
   data.users[idx].updated_at = new Date().toISOString();
 
-  try {
-    await saveUsers(data, sha);
-  } catch (e) {
-    return res.status(500).json({ error: 'Gagal menyimpan.' });
-  }
+  try { await saveUsers(data, sha); }
+  catch (e) { return res.status(500).json({ error: 'Gagal menyimpan.' }); }
 
   return res.status(200).json({ message: 'Data pengguna berhasil diperbarui.' });
 }
@@ -405,46 +382,39 @@ async function handleChangePassword(req, res) {
   if (!session) return res.status(401).json({ error: 'Sesi tidak valid.' });
 
   const { old_password, new_password } = req.body || {};
-  if (!old_password || !new_password) {
+  if (!old_password || !new_password)
     return res.status(400).json({ error: 'Password lama dan baru diperlukan.' });
-  }
-  if (new_password.length < 6) {
+  if (new_password.length < 6)
     return res.status(400).json({ error: 'Password baru minimal 6 karakter.' });
-  }
 
   let result;
-  try {
-    result = await getUsers();
-  } catch (e) {
-    return res.status(500).json({ error: 'Gagal membaca data pengguna.' });
-  }
+  try { result = await getUsers(); }
+  catch (e) { return res.status(500).json({ error: 'Gagal membaca data pengguna.' }); }
 
   const { data, sha } = result;
   const idx = (data.users || []).findIndex(u => u.id === session.id);
   if (idx === -1) return res.status(404).json({ error: 'Akun tidak ditemukan.' });
 
-  const user = data.users[idx];
-  const oldHashed = await hashPassword(old_password);
+  const user       = data.users[idx];
+  const oldHashed  = await hashPassword(old_password);
   const passwordValid = user.password === old_password || user.password === oldHashed;
 
-  if (!passwordValid) {
+  if (!passwordValid)
     return res.status(401).json({ error: 'Password lama tidak sesuai.' });
-  }
 
-  data.users[idx].password = await hashPassword(new_password);
+  data.users[idx].password   = await hashPassword(new_password);
   data.users[idx].updated_at = new Date().toISOString();
 
-  try {
-    await saveUsers(data, sha);
-  } catch (e) {
-    return res.status(500).json({ error: 'Gagal menyimpan.' });
-  }
+  try { await saveUsers(data, sha); }
+  catch (e) { return res.status(500).json({ error: 'Gagal menyimpan.' }); }
 
   return res.status(200).json({ message: 'Password berhasil diubah.' });
 }
 
-// ─── LIST MAHASISWA (requires valid session token, any role) ──────────────────
-// Returns only mahasiswa, without passwords — safe for dosen/admin use
+// ─── LIST MAHASISWA ───────────────────────────────────────────────────────────
+// GET /api/auth/list-mahasiswa
+// Requires valid session token (any role). Returns mahasiswa only, no passwords.
+// v2: sertakan kelas_ids agar frontend bisa tahu mahasiswa sudah di kelas mana.
 
 async function handleListMahasiswa(req, res) {
   const token = req.headers['x-session-token'];
@@ -453,20 +423,18 @@ async function handleListMahasiswa(req, res) {
   if (!session) return res.status(401).json({ error: 'Sesi tidak valid.' });
 
   let result;
-  try {
-    result = await getUsers();
-  } catch (e) {
-    return res.status(500).json({ error: 'Gagal membaca data pengguna.' });
-  }
+  try { result = await getUsers(); }
+  catch (e) { return res.status(500).json({ error: 'Gagal membaca data pengguna.' }); }
 
   const mahasiswa = (result.data.users || [])
     .filter(u => u.role === 'mahasiswa')
     .map(u => ({
-      id:      u.id,
-      nim_nip: u.nim_nip,
-      nama:    u.nama,
-      jurusan: u.jurusan || null,
-      semester:u.semester || null,
+      id:        u.id,
+      nim_nip:   u.nim_nip,
+      nama:      u.nama,
+      jurusan:   u.jurusan   || null,
+      semester:  u.semester  || null,
+      kelas_ids: u.kelas_ids || [],   // v2
     }));
 
   return res.status(200).json({ mahasiswa });
