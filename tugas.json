@@ -103,6 +103,18 @@
       "status": "aktif",
       "pengumpulan": [],
       "created_at": "2026-06-11T10:32:44.294Z"
+    },
+    {
+      "id": "tgs_1781178374362",
+      "judul": "Tugas 2 - Membuat Video Pemanasan Lari",
+      "deskripsi": "Maksimal 5 Menit",
+      "kelas_id": "kls_1781165925917",
+      "matkul_id": "mk_1781006313065",
+      "deadline": "2026-06-15T18:46",
+      "dosen_id": "usr_1781166257496",
+      "status": "aktif",
+      "pengumpulan": [],
+      "created_at": "2026-06-11T11:46:14.362Z"
     }
   ]
 }
