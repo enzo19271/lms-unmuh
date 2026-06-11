@@ -115,6 +115,18 @@
       "status": "aktif",
       "pengumpulan": [],
       "created_at": "2026-06-11T11:46:14.362Z"
+    },
+    {
+      "id": "tgs_1781178407467",
+      "judul": "Tugas 3 - Analisis sebuah instrumen lari",
+      "deskripsi": "Uji coba",
+      "kelas_id": "kls_1781165925917",
+      "matkul_id": "mk_1781006313065",
+      "deadline": "2026-06-15T18:46",
+      "dosen_id": "usr_1781166257496",
+      "status": "aktif",
+      "pengumpulan": [],
+      "created_at": "2026-06-11T11:46:47.467Z"
     }
   ]
 }
