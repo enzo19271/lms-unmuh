@@ -112,9 +112,38 @@
     .pill-gray   { background:#F1F5F9; color:#64748B; }
     .pill-blue   { background:var(--blue-pale);   color:var(--blue); }
 
-    /* ── ABSENSI ── */
-    .tab-btn { padding:7px 16px; border-radius:20px; border:1.5px solid #E2E8F0; font-size:13px; font-weight:600; cursor:pointer; background:#fff; color:#64748B; font-family:'Inter',sans-serif; transition:all .15s; }
-    .tab-btn.active { background:var(--navy); color:#fff; border-color:var(--navy); }
+    /* ── ABSENSI DROPDOWN PICKER ── */
+    .abs-picker-wrap { max-width:520px; }
+    .abs-picker-label { font-size:11px; font-weight:700; color:#64748B; text-transform:uppercase; letter-spacing:.6px; display:block; margin-bottom:8px; }
+    .abs-select-outer { position:relative; }
+    .abs-select {
+      width:100%; height:50px;
+      padding:0 44px 0 16px;
+      border:1.5px solid #E2E8F0;
+      border-radius:12px;
+      font-size:14px; font-weight:600;
+      font-family:'Inter',sans-serif;
+      color:var(--navy);
+      background:#fff;
+      appearance:none; -webkit-appearance:none;
+      outline:none; cursor:pointer;
+      transition:border-color .2s, box-shadow .2s;
+    }
+    .abs-select:focus { border-color:var(--blue-light); box-shadow:0 0 0 3px rgba(37,99,235,.1); }
+    .abs-select-chevron {
+      position:absolute; right:14px; top:50%; transform:translateY(-50%);
+      width:18px; height:18px; color:#64748B; pointer-events:none;
+    }
+    .abs-info-badge {
+      display:inline-flex; align-items:center; gap:6px;
+      margin-top:10px; padding:7px 13px; border-radius:20px;
+      font-size:12px; font-weight:600;
+    }
+    .abs-info-today  { background:#DCFCE7; color:#15803D; }
+    .abs-info-noday  { background:#F1F5F9; color:#64748B; }
+    .abs-info-loading{ background:#EFF4FF; color:var(--blue); }
+
+    /* ── ABSENSI PERTEMUAN ── */
     .ptm-card { background:#fff; border-radius:12px; border:1px solid #E2E8F0; overflow:hidden; margin-bottom:10px; }
     .ptm-card-header { padding:14px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
     .ptm-card-body { border-top:1px solid #F1F5F9; padding:14px 16px; }
@@ -122,6 +151,11 @@
     .badge-hadir      { background:var(--green-pale); color:var(--green); padding:3px 9px; border-radius:20px; font-size:11px; font-weight:700; display:inline-block; }
     .badge-tidak_hadir{ background:var(--red-pale); color:var(--red); padding:3px 9px; border-radius:20px; font-size:11px; font-weight:700; display:inline-block; }
     .badge-izin       { background:#EDE9FE; color:#7C3AED; padding:3px 9px; border-radius:20px; font-size:11px; font-weight:700; display:inline-block; }
+
+    /* Progress absensi */
+    .abs-progress-wrap { margin-bottom:20px; }
+    .abs-progress-bar-bg { height:8px; background:#E2E8F0; border-radius:99px; overflow:hidden; margin-top:6px; }
+    .abs-progress-bar-fill { height:100%; border-radius:99px; background:var(--green); transition:width .4s ease; }
 
     /* ── DISKUSI ── */
     .diskusi-layout { display:grid; grid-template-columns:260px 1fr; gap:20px; height:calc(100vh - var(--topbar-h) - 80px); min-height:500px; }
@@ -184,6 +218,7 @@
       .welcome-banner { flex-direction:column !important; align-items:flex-start !important; gap:12px; }
       .diskusi-layout { grid-template-columns:1fr; height:auto; }
       .diskusi-rooms { height:180px; }
+      .abs-picker-wrap { max-width:100%; }
     }
   </style>
 </head>
@@ -376,13 +411,45 @@
   <div class="content" id="page-absensi">
     <div class="page-header mb-3">
       <h2>Absensi</h2>
-      <p class="text-muted" style="font-size:14px;">Daftar pertemuan mata kuliah — klik pertemuan untuk submit kehadiran.</p>
+      <p class="text-muted" style="font-size:14px;">Pilih mata kuliah untuk melihat dan mengisi absensi pertemuan.</p>
     </div>
-    <div class="d-flex gap-2 flex-wrap mb-3" id="abs-matkul-tabs">
-      <span class="text-muted" style="font-size:13px;">Memuat mata kuliah...</span>
+
+    <!-- Dropdown Picker -->
+    <div class="abs-picker-wrap mb-4">
+      <span class="abs-picker-label">Pilih Mata Kuliah</span>
+      <div class="abs-select-outer">
+        <select class="abs-select" id="abs-matkul-select" onchange="switchAbsMatkul(this.value)">
+          <option value="">⏳ Memuat mata kuliah...</option>
+        </select>
+        <svg class="abs-select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M6 9l6 6 6-6"/>
+        </svg>
+      </div>
+      <!-- Info badge: berubah sesuai status -->
+      <div id="abs-info-badge"></div>
     </div>
+
+    <!-- Progres kehadiran ringkasan -->
+    <div id="abs-progress-wrap" style="display:none;" class="mb-3">
+      <div class="lms-card">
+        <div class="lms-card-body py-3">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span style="font-size:13px;font-weight:600;color:var(--navy);">Progres Kehadiran</span>
+            <span style="font-size:13px;font-weight:700;color:var(--green);" id="abs-progress-pct">—</span>
+          </div>
+          <div class="abs-progress-bar-bg">
+            <div class="abs-progress-bar-fill" id="abs-progress-bar" style="width:0%"></div>
+          </div>
+          <div style="font-size:11px;color:#64748B;margin-top:6px;" id="abs-progress-detail">—</div>
+        </div>
+      </div>
+    </div>
+
     <div id="abs-pertemuan-content">
-      <div class="text-center text-muted py-4" style="font-size:13px;">Pilih mata kuliah di atas.</div>
+      <div class="text-center text-muted py-5" style="font-size:13px;">
+        <span style="font-size:36px;display:block;margin-bottom:10px;">📋</span>
+        Pilih mata kuliah di atas untuk melihat daftar pertemuan.
+      </div>
     </div>
   </div>
 
@@ -730,112 +797,248 @@
   }
 
   // ═══════════════════════════════════════════════════════
-  //  ABSENSI MAHASISWA
+  //  ABSENSI — STATE
   // ═══════════════════════════════════════════════════════
   let activeAbsMatkul = null;
+  let absTodayMatkul  = [];   // nama-nama matkul yang punya pertemuan hari ini
+  let absInitDone     = false;
 
-  function initAbsensiMhs() {
-    const tabsEl = document.getElementById('abs-matkul-tabs');
+  // ═══════════════════════════════════════════════════════
+  //  ABSENSI — INIT DROPDOWN (dipanggil saat page absensi dibuka)
+  // ═══════════════════════════════════════════════════════
+  async function initAbsensiMhs() {
+    absInitDone = true;
+    const selectEl  = document.getElementById('abs-matkul-select');
+    const badgeEl   = document.getElementById('abs-info-badge');
+
     if (!allMatkul.length) {
-      tabsEl.innerHTML = '<span class="text-muted" style="font-size:13px;">Tidak ada mata kuliah.</span>';
+      selectEl.innerHTML = '<option value="">Tidak ada mata kuliah terdaftar</option>';
+      badgeEl.innerHTML  = '';
       return;
     }
-    tabsEl.innerHTML = allMatkul.map((m,i) =>
-      `<button class="tab-btn${i===0?' active':''}" onclick="switchAbsMatkul('${m.nama}',this)">${m.nama}</button>`
-    ).join('');
-    switchAbsMatkul(allMatkul[0].nama);
+
+    // Tampilkan loading badge sementara cek pertemuan
+    selectEl.innerHTML = '<option value="">⏳ Memeriksa pertemuan hari ini...</option>';
+    selectEl.disabled  = true;
+    badgeEl.innerHTML  = `<span class="abs-info-badge abs-info-loading">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+      Memeriksa jadwal hari ini...
+    </span>`;
+
+    // Paralel: cek semua matkul yang punya pertemuan aktif hari ini
+    absTodayMatkul = [];
+    const today = new Date().toDateString();
+    await Promise.all(allMatkul.map(async m => {
+      try {
+        const res  = await fetch(`/api/absensi/list-pertemuan?matkul=${encodeURIComponent(m.nama)}`, { headers: authHeaders() });
+        const data = await res.json();
+        const hasToday = (data.pertemuan || []).some(p =>
+          new Date(p.tanggal).toDateString() === today && p.status === 'aktif'
+        );
+        if (hasToday) absTodayMatkul.push(m.nama);
+      } catch(e) { /* lewati jika gagal */ }
+    }));
+
+    // Susun opsi: hari ini dulu, lalu yang lain
+    const todayList = allMatkul.filter(m => absTodayMatkul.includes(m.nama));
+    const otherList = allMatkul.filter(m => !absTodayMatkul.includes(m.nama));
+
+    selectEl.innerHTML = '';
+    selectEl.disabled  = false;
+
+    if (todayList.length) {
+      const grp = document.createElement('optgroup');
+      grp.label = '🔴 Ada Pertemuan Hari Ini';
+      todayList.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value       = m.nama;
+        opt.textContent = m.nama;
+        grp.appendChild(opt);
+      });
+      selectEl.appendChild(grp);
+    }
+
+    if (otherList.length) {
+      const grp = document.createElement('optgroup');
+      grp.label = todayList.length ? '📚 Mata Kuliah Lainnya' : '📚 Semua Mata Kuliah';
+      otherList.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value       = m.nama;
+        opt.textContent = m.nama;
+        grp.appendChild(opt);
+      });
+      selectEl.appendChild(grp);
+    }
+
+    // Pilih otomatis: utamakan yang ada pertemuan hari ini
+    const defaultMatkul = todayList.length ? todayList[0].nama : allMatkul[0].nama;
+    selectEl.value = defaultMatkul;
+    switchAbsMatkul(defaultMatkul);
   }
 
-  function switchAbsMatkul(matkul, btn) {
+  // ═══════════════════════════════════════════════════════
+  //  ABSENSI — SWITCH MATKUL
+  // ═══════════════════════════════════════════════════════
+  function switchAbsMatkul(matkul) {
+    if (!matkul) return;
     activeAbsMatkul = matkul;
-    document.querySelectorAll('#abs-matkul-tabs .tab-btn').forEach(b => b.classList.remove('active'));
-    if (btn) btn.classList.add('active');
-    else document.querySelectorAll('#abs-matkul-tabs .tab-btn').forEach(b => { if(b.textContent.trim()===matkul) b.classList.add('active'); });
+
+    // Update info badge
+    const badgeEl = document.getElementById('abs-info-badge');
+    const isToday = absTodayMatkul.includes(matkul);
+    badgeEl.innerHTML = isToday
+      ? `<span class="abs-info-badge abs-info-today">✅ Ada pertemuan aktif hari ini — kamu bisa absen sekarang</span>`
+      : `<span class="abs-info-badge abs-info-noday">📅 Tidak ada pertemuan hari ini — lihat riwayat absensi di bawah</span>`;
+
+    // Reset progress
+    document.getElementById('abs-progress-wrap').style.display = 'none';
+
     loadAbsensiMhs(matkul);
   }
 
+  // ═══════════════════════════════════════════════════════
+  //  ABSENSI — LOAD PERTEMUAN
+  // ═══════════════════════════════════════════════════════
   async function loadAbsensiMhs(matkul) {
     const container = document.getElementById('abs-pertemuan-content');
-    container.innerHTML = '<div class="text-center text-muted py-4" style="font-size:13px;">⏳ Memuat pertemuan...</div>';
+    container.innerHTML = '<div class="loading-row"><div class="spinner-sm"></div> Memuat pertemuan...</div>';
     try {
-      const res = await fetch(`/api/absensi/list-pertemuan?matkul=${encodeURIComponent(matkul)}`, { headers: authHeaders() });
+      const res  = await fetch(`/api/absensi/list-pertemuan?matkul=${encodeURIComponent(matkul)}`, { headers: authHeaders() });
       const data = await res.json();
       renderAbsensiMhs(data.pertemuan || [], matkul);
     } catch(e) {
-      container.innerHTML = '<div class="text-center text-danger py-4" style="font-size:13px;">Gagal memuat data pertemuan.</div>';
+      container.innerHTML = '<div class="text-center text-danger py-4" style="font-size:13px;">⚠️ Gagal memuat data pertemuan.</div>';
     }
   }
 
+  // ═══════════════════════════════════════════════════════
+  //  ABSENSI — RENDER PERTEMUAN
+  // ═══════════════════════════════════════════════════════
   function renderAbsensiMhs(list, matkul) {
     const container = document.getElementById('abs-pertemuan-content');
+
     if (!list.length) {
-      container.innerHTML = `<div class="text-center text-muted py-5" style="font-size:13px;">Belum ada pertemuan untuk <strong>${matkul}</strong>.</div>`;
+      container.innerHTML = `<div class="empty-state">
+        <span class="es-icon">📋</span>
+        <p><strong>Belum ada pertemuan</strong><br>Dosen belum membuat pertemuan untuk <strong>${matkul}</strong>.</p>
+      </div>`;
+      document.getElementById('abs-progress-wrap').style.display = 'none';
       return;
     }
+
+    // Hitung progres kehadiran
+    let hadirCount = 0, totalAbsen = 0;
+    list.forEach(ptm => {
+      const k = ptm.kehadiran.find(x => x.mhs_id === currentUser.id || x.nim === currentUser.nim_nip);
+      if (k) {
+        totalAbsen++;
+        if (k.status === 'hadir') hadirCount++;
+      } else if (ptm.status !== 'aktif') {
+        totalAbsen++; // pertemuan tutup tanpa absensi = tidak hadir
+      }
+    });
+    const pct = totalAbsen > 0 ? Math.round((hadirCount / totalAbsen) * 100) : 0;
+    const pctColor = pct >= 75 ? 'var(--green)' : pct >= 50 ? 'var(--yellow)' : 'var(--red)';
+
+    const progressWrap = document.getElementById('abs-progress-wrap');
+    progressWrap.style.display = 'block';
+    document.getElementById('abs-progress-pct').textContent   = `${pct}%`;
+    document.getElementById('abs-progress-pct').style.color   = pctColor;
+    document.getElementById('abs-progress-bar').style.width    = `${pct}%`;
+    document.getElementById('abs-progress-bar').style.background = pctColor;
+    document.getElementById('abs-progress-detail').textContent =
+      `${hadirCount} hadir dari ${totalAbsen} pertemuan tercatat · Total ${list.length} pertemuan`;
+
+    // Update badge absensi di sidebar
     const pending = list.filter(p => {
       const k = p.kehadiran.find(x => x.mhs_id === currentUser.id || x.nim === currentUser.nim_nip);
       return !k && p.status === 'aktif';
     }).length;
-    const badgeEl = document.getElementById('badge-absensi');
-    if (badgeEl) { badgeEl.textContent = pending; badgeEl.style.display = pending > 0 ? 'flex' : 'none'; }
+    const navBadge = document.getElementById('badge-absensi');
+    if (navBadge) { navBadge.textContent = pending; navBadge.style.display = pending > 0 ? 'flex' : 'none'; }
 
-    const sorted = [...list].sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+    // Sort: hari ini dulu (aktif), lalu terbaru
+    const today = new Date().toDateString();
+    const sorted = [...list].sort((a, b) => {
+      const aToday = new Date(a.tanggal).toDateString() === today && a.status === 'aktif';
+      const bToday = new Date(b.tanggal).toDateString() === today && b.status === 'aktif';
+      if (aToday && !bToday) return -1;
+      if (!aToday && bToday) return 1;
+      return new Date(b.tanggal) - new Date(a.tanggal);
+    });
+
     container.innerHTML = sorted.map(ptm => {
       const tgl = new Date(ptm.tanggal).toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
       const k   = ptm.kehadiran.find(x => x.mhs_id === currentUser.id || x.nim === currentUser.nim_nip);
+
       const statusBadge = k
-        ? `<span class="badge-${k.status}">${k.status==='hadir'?'✅ Hadir':k.status==='izin'?'📋 Izin':k.status==='sakit'?'🤒 Sakit':k.status==='tidak_hadir'?'❌ Tidak Hadir':'⏳ Menunggu Verifikasi'}</span>`
+        ? (k.status === 'hadir'
+            ? `<span class="badge-hadir">✅ Hadir</span>`
+            : k.status === 'izin'
+            ? `<span class="badge-izin">📋 Izin</span>`
+            : k.status === 'sakit'
+            ? `<span class="badge-izin" style="background:#F5F3FF;color:#7C3AED">🤒 Sakit</span>`
+            : k.status === 'tidak_hadir'
+            ? `<span class="badge-tidak_hadir">❌ Tidak Hadir</span>`
+            : `<span class="badge-menunggu">⏳ Menunggu Verifikasi</span>`)
         : (ptm.status === 'aktif'
             ? '<span class="badge-menunggu" style="background:#DBEAFE;color:var(--blue)">📥 Belum Absen</span>'
-            : '<span style="font-size:12px;color:#CBD5E1">— Tidak Hadir</span>');
+            : '<span style="font-size:12px;color:#CBD5E1;font-weight:600;">— Tidak Tercatat</span>');
 
-      const ptmDate = new Date(ptm.tanggal);
-      const today   = new Date();
-      const sameDay = ptmDate.toDateString() === today.toDateString();
-      const canSubmit = !k && ptm.status === 'aktif' && sameDay;
-      const wrongDay  = !k && ptm.status === 'aktif' && !sameDay;
+      const ptmDate      = new Date(ptm.tanggal);
+      const isToday      = ptmDate.toDateString() === today;
+      const canSubmit    = !k && ptm.status === 'aktif' && isToday;
+      const wrongDay     = !k && ptm.status === 'aktif' && !isToday;
       const ptmDateLabel = ptmDate.toLocaleDateString('id-ID',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
 
-      return `<div class="ptm-card">
+      // Highlight border untuk pertemuan hari ini
+      const cardStyle = isToday && ptm.status === 'aktif'
+        ? 'border-color:var(--blue-light);box-shadow:0 0 0 2px rgba(37,99,235,.1);'
+        : '';
+
+      return `<div class="ptm-card" style="${cardStyle}">
         <div class="ptm-card-header">
-          <div>
-            <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:3px;">${ptm.judul}</div>
-            <div class="text-muted" style="font-size:12px;">📅 ${tgl}${ptm.keterangan?' · '+ptm.keterangan:''}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${ptm.judul}</div>
+            <div class="text-muted" style="font-size:12px;">📅 ${tgl}${ptm.keterangan ? ' · ' + ptm.keterangan : ''}</div>
           </div>
-          <div class="text-end flex-shrink-0">${statusBadge}</div>
+          <div class="text-end flex-shrink-0 ms-2">${statusBadge}</div>
         </div>
         ${canSubmit ? `<div class="ptm-card-body">
-          <div class="text-muted mb-3" style="font-size:12px;">Pilih alasan kehadiran, lalu klik <strong>Submit</strong>.</div>
+          <div class="text-muted mb-3" style="font-size:12px;">Pilih status kehadiran, lalu klik <strong>Submit</strong>.</div>
           <div class="d-flex gap-2 flex-wrap mb-3">
-            <label id="lbl-hadir-${ptm.id}" class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 border fw-semibold" style="cursor:pointer;font-size:12px;">
+            <label id="lbl-hadir-${ptm.id}" class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 border fw-semibold" style="cursor:pointer;font-size:12px;transition:all .15s;">
               <input type="radio" name="alasan-${ptm.id}" value="hadir" onchange="updateAlasanStyle('${ptm.id}')" style="accent-color:var(--green)"/> ✅ Hadir
             </label>
-            <label id="lbl-izin-${ptm.id}" class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 border fw-semibold" style="cursor:pointer;font-size:12px;">
+            <label id="lbl-izin-${ptm.id}" class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 border fw-semibold" style="cursor:pointer;font-size:12px;transition:all .15s;">
               <input type="radio" name="alasan-${ptm.id}" value="izin" onchange="updateAlasanStyle('${ptm.id}')"/> 📋 Izin
             </label>
-            <label id="lbl-sakit-${ptm.id}" class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 border fw-semibold" style="cursor:pointer;font-size:12px;">
+            <label id="lbl-sakit-${ptm.id}" class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 border fw-semibold" style="cursor:pointer;font-size:12px;transition:all .15s;">
               <input type="radio" name="alasan-${ptm.id}" value="sakit" onchange="updateAlasanStyle('${ptm.id}')"/> 🤒 Sakit
             </label>
           </div>
           <div class="d-flex gap-2 flex-wrap align-items-center">
             <input type="text" id="ket-${ptm.id}" placeholder="Keterangan tambahan (opsional)" class="form-control form-control-sm" style="flex:1;min-width:160px;"/>
-            <button onclick="submitHadir('${ptm.id}','${ptm.judul.replace(/'/g,'')}')" class="btn btn-primary btn-sm px-3 fw-semibold" style="white-space:nowrap;">✋ Submit</button>
+            <button onclick="submitHadir('${ptm.id}','${ptm.judul.replace(/'/g,'').replace(/"/g,'')}')" class="btn btn-primary btn-sm px-3 fw-semibold" style="white-space:nowrap;">✋ Submit</button>
           </div>
         </div>` : ''}
-        ${wrongDay ? `<div class="ptm-card-body" style="font-size:12px;color:var(--yellow);background:var(--yellow-pale);border-radius:8px;border:1px solid #FDE68A;">
+        ${wrongDay ? `<div class="ptm-card-body" style="font-size:12px;color:var(--yellow);background:var(--yellow-pale);border-radius:0 0 8px 8px;border-top:1px solid #FDE68A;">
           ⏰ Absensi hanya bisa dilakukan pada hari pertemuan berlangsung (<strong>${ptmDateLabel}</strong>).
         </div>` : ''}
-        ${k?.status === 'menunggu' ? `<div class="ptm-card-body text-muted" style="font-size:12px;">⏳ Kehadiran Anda sudah dikirim, menunggu verifikasi dosen.</div>` : ''}
+        ${k?.status === 'menunggu' ? `<div class="ptm-card-body text-muted" style="font-size:12px;">⏳ Kehadiran sudah dikirim, menunggu verifikasi dosen.</div>` : ''}
       </div>`;
     }).join('');
   }
 
+  // ═══════════════════════════════════════════════════════
+  //  ABSENSI — STYLING RADIO
+  // ═══════════════════════════════════════════════════════
   function updateAlasanStyle(ptmId) {
     const selected = document.querySelector(`input[name="alasan-${ptmId}"]:checked`)?.value;
     const colorMap = {
-      hadir: { border:'var(--green)', bg:'var(--green-pale)' },
+      hadir: { border:'var(--green)',  bg:'var(--green-pale)' },
       izin:  { border:'var(--yellow)', bg:'var(--yellow-pale)' },
-      sakit: { border:'#7C3AED', bg:'#F5F3FF' },
+      sakit: { border:'#7C3AED',       bg:'#F5F3FF' },
     };
     ['hadir','izin','sakit'].forEach(v => {
       const lbl = document.getElementById(`lbl-${v}-${ptmId}`);
@@ -845,6 +1048,9 @@
     });
   }
 
+  // ═══════════════════════════════════════════════════════
+  //  ABSENSI — SUBMIT HADIR
+  // ═══════════════════════════════════════════════════════
   async function submitHadir(pertemuanId, judul) {
     const alasan     = document.querySelector(`input[name="alasan-${pertemuanId}"]:checked`)?.value;
     const keterangan = document.getElementById(`ket-${pertemuanId}`)?.value || '';
@@ -894,7 +1100,7 @@
 
   async function loadChatMessages(matkul) {
     try {
-      const res = await fetch(`/api/diskusi/pesan?matkul=${encodeURIComponent(matkul)}&limit=60`, { headers: authHeaders() });
+      const res  = await fetch(`/api/diskusi/pesan?matkul=${encodeURIComponent(matkul)}&limit=60`, { headers: authHeaders() });
       const data = await res.json();
       renderChatMessages(data.pesan || [], matkul);
     } catch(e) {
@@ -918,7 +1124,9 @@
       const isMe    = m.sender_id === currentUser.id;
       const inisial = (m.sender_nama||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
       const time    = new Date(m.created_at).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
-      const roleTag = m.role==='dosen' ? ` <span style="font-size:10px;background:var(--blue-pale);color:var(--blue);padding:1px 5px;border-radius:4px;font-weight:600">Dosen</span>` : '';
+      const roleTag = m.role==='dosen'
+        ? ` <span style="font-size:10px;background:var(--blue-pale);color:var(--blue);padding:1px 5px;border-radius:4px;font-weight:600">Dosen</span>`
+        : '';
       return `<div class="chat-msg${isMe?' me':''}">
         <div class="msg-avatar" style="${m.role==='dosen'?'background:var(--navy);color:white':''}">${inisial}</div>
         <div>
@@ -930,8 +1138,8 @@
     }).join('');
 
     if (messages.length && matkul) {
-      const last = messages[messages.length-1];
-      const drEl = document.getElementById(`dr-mhs-last-${matkul.replace(/\s+/g,'_')}`);
+      const last  = messages[messages.length-1];
+      const drEl  = document.getElementById(`dr-mhs-last-${matkul.replace(/\s+/g,'_')}`);
       if (drEl) drEl.textContent = last.sender_nama.split(' ')[0]+': '+last.isi.substring(0,35)+(last.isi.length>35?'…':'');
     }
 
@@ -979,7 +1187,7 @@
     });
     document.getElementById('topbar-title').textContent = titles[id] || id;
     if (id === 'diskusi') renderDiskusiRooms();
-    if (id === 'absensi' && activeAbsMatkul === null) initAbsensiMhs();
+    if (id === 'absensi' && !absInitDone) initAbsensiMhs();
     closeSidebar();
     window.scrollTo(0,0);
   }
