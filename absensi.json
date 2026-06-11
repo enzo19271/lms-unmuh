@@ -261,7 +261,18 @@
       "dosen_id": "usr_1781089978920",
       "status": "aktif",
       "created_at": "2026-06-10T12:48:11.679Z",
-      "kehadiran": []
+      "kehadiran": [
+        {
+          "mhs_id": "usr_1781090075804",
+          "nim": "250241117",
+          "nama": "Arlan Rengga",
+          "status": "menunggu",
+          "alasan_tipe": "hadir",
+          "keterangan": "",
+          "submitted_at": "2026-06-11T04:58:50.787Z",
+          "verified_at": null
+        }
+      ]
     }
   ]
 }
