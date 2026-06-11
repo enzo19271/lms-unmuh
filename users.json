@@ -519,8 +519,10 @@
       "password": "9464fb01de62761d5691f5eb89e80aa1e40a84bea6ee5d2ab5ca90efd9776b47",
       "role": "mahasiswa",
       "created_at": "2026-06-10T05:23:04.562667Z",
-      "jurusan": "Akuntansi",
-      "semester": 5
+      "jurusan": "Pendidikan Jasmani Kesehatan dan Rekreasi",
+      "semester": 2,
+      "mata_kuliah": [],
+      "updated_at": "2026-06-11T10:21:43.122Z"
     },
     {
       "id": "usr_1781725965294",
